@@ -1,4 +1,6 @@
-## Available widgets (import from SuperTTK.py)
+See SuperTTK.py for arguments / example usages 
+
+### Available widgets (import from SuperTTK.py)
 	LabeledCheckbutton
 	LabeledMultiCheckbutton
 	LabeledCombobox
@@ -30,5 +32,5 @@
 		.clear() #Resets to the default
 		.link() #Only available on some display widgets like LabeledProgressbars, links to an input widget
 
-Multi Widgets:
+### Multi Widgets:
 	Labeled Widgets with labeled sub-widgets of a given type
