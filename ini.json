@@ -1,0 +1,12 @@
+{
+    "application": "Test Application",
+    "version": "0.0",
+    "width": 400,
+    "height": 400,
+    "minwidth": 400,
+    "minheight": 400,
+    "resizable_width": true,
+    "resizable_height": true,
+    "start_maximized": false,
+    "scaling": 1.75
+}
