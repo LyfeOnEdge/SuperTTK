@@ -1,18 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
-#TODO:
-# Scrolled Table
-# Scrolled Canvas
-# Drawing canvas 
-# Todo example
-# Calculator
-# Help Manual Object
-# selection item demo tab
-# Labeled Radiobutton
-# Add/remove buttons from multicheckbutton
-# Satisfaction / Severity / Triage button table generator
-
 import sys
 if sys.hexversion < 0x03060000:
 	sys.exit('Python 3.6 or greater is required to run this program.')
@@ -27,43 +15,41 @@ import tkinter.font as tkFont
 from tkinter import ttk
 from typing import Callable
 from math import sin
-from widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
-from widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
-from widgets.OptionMenuWidgets import LabeledOptionMenu, LabeledMultiOptionMenu
-from widgets.EntryWidgets import LabeledEntry, LabeledMultiEntry
-from widgets.ProgressbarWidgets import LabeledProgressbar, LabeledMultiProgressbar
-from widgets.ScaleWidgets import LabeledScale, LabeledMultiScale
-from widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
-from widgets.TextWidgets import ScrolledText, CopyBox
-from widgets.WidgetsCore import default_separator, default_pack, default_vertical_separator,\
-	default_vertical_pack, copy_to_user_clipboard, recursive_widget_search
-from utils.utils import run_cl, open_link
-from utils.lorem_ipsum import get_lorem_paragraphs
+
+if __name__=='__main__':
+	from widgets.WidgetsCore import default_separator, default_pack, default_vertical_separator,\
+		default_vertical_pack, copy_to_user_clipboard, recursive_widget_search
+	from widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
+	from widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
+	from widgets.OptionMenuWidgets import LabeledOptionMenu, LabeledMultiOptionMenu
+	from widgets.EntryWidgets import LabeledEntry, LabeledMultiEntry, LabeledButtonEntry
+	from widgets.ProgressbarWidgets import LabeledProgressbar, LabeledMultiProgressbar
+	from widgets.ScaleWidgets import LabeledScale, LabeledMultiScale
+	from widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
+	from widgets.TextWidgets import ScrolledText, CopyBox
+	from widgets.ConsoleWidgets import ConsoleWidget
+	from widgets.Tabs import Tab, LauncherTab, BrowserLauncherTab, CommandLauncherTab, ConsoleTab
+	from widgets.ToolTip import ToolTip
+	from utils.utils import run_cl, open_link
+	from utils.lorem_ipsum import get_lorem_paragraphs
+else:
+	from .widgets.WidgetsCore import default_separator, default_pack, default_vertical_separator,\
+		default_vertical_pack, copy_to_user_clipboard, recursive_widget_search
+	from .widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
+	from .widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
+	from .widgets.OptionMenuWidgets import LabeledOptionMenu, LabeledMultiOptionMenu
+	from .widgets.EntryWidgets import LabeledEntry, LabeledMultiEntry, LabeledButtonEntry
+	from .widgets.ProgressbarWidgets import LabeledProgressbar, LabeledMultiProgressbar
+	from .widgets.ScaleWidgets import LabeledScale, LabeledMultiScale
+	from .widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
+	from .widgets.TextWidgets import ScrolledText, CopyBox
+	from .widgets.ConsoleWidgets import ConsoleWidget
+	from .widgets.Tabs import Tab, LauncherTab, BrowserLauncherTab, CommandLauncherTab, ConsoleTab
+	from .widgets.ToolTip import ToolTip
+	from .utils.utils import run_cl, open_link
+	from .utils.lorem_ipsum import get_lorem_paragraphs
 
 def get_themes_folder(): return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'themes')
-
-#Tabs add themselves self to their parent notebook
-class Tab(ttk.Frame):
-	def __init__(self, notebook: ttk.Notebook, title: str):
-		ttk.Frame.__init__(self, notebook)
-		notebook.add(self, text=title)
-
-class LauncherTab(Tab):
-	def __init__(self, notebook:ttk.Notebook, title:str, options:dict, action:Callable):
-		Tab.__init__(self, notebook, title)
-		# inner_frame = ttk.Frame(self)
-		# inner_frame.pack(fill=tk.BOTH, expand=True)
-		for title in options:
-			button = ttk.Button(self,text=title,command=lambda title=title:action(options[title]))
-			button.pack(fill='x', expand=False, side=tk.TOP)
-
-class CommandLauncherTab(LauncherTab):
-	def __init__(self, notebook:ttk.Notebook, title:str, options:dict):
-		LauncherTab.__init__(self, notebook, title, options, run_cl)
-
-class BrowserLauncherTab(LauncherTab):
-	def __init__(self, notebook:ttk.Notebook, title:str, options:dict):
-		LauncherTab.__init__(self, notebook, title, options, open_link)
 
 class _AbstractAppMixin: #Non-functional code, etc
 	def __init__(self, ini_data: dict):
@@ -154,31 +140,23 @@ class App(_AbstractAppMixin): #Main Application Object
 if __name__ == '__main__':
 	print("SuperTTK Example / Test")
 
+	links = {
+				'Google':'https://www.google.com/',
+				'YouTube':'http://youtu.be/',
+				'Gmail':'https://www.gmail.com/',
+			}
+	apps = {
+				"System Info" : ["C:\Windows\System32\msinfo32.exe"],
+				"Winver" : ["C:\Windows\System32\winver.exe"],
+				"Task Manager" : ["C:\Windows\System32\Taskmgr.exe"] #Fails on some systems      
+			}
+
 	class TextBoxTestTab(Tab):
 		def __init__(self, notebook:ttk.Notebook):
 			Tab.__init__(self, notebook, 'AutoScrollbarredTextbox')
 			text = ScrolledText(self)
 			text.pack(fill='both', expand=True, side=tk.TOP)
 			text.insert('1.0', get_lorem_paragraphs(1000))
-
-	class ConsoleTab(Tab):
-		def __init__(self, notebook:ttk.Notebook):
-			Tab.__init__(self, notebook, 'Console')
-			self.console = ScrolledText(self,highlightthickness=0,state=tk.DISABLED)
-			self.console.pack(fill='both', expand=True)
-			footer = ttk.Frame(self)
-			footer.pack(fill='both', expand=False, side=tk.BOTTOM)
-			self.entry = LabeledEntry(footer, "Command Interface Example", command=self.on_button_click)
-			self.entry.pack(fill='x', expand=True, side=tk.LEFT)
-			button = ttk.Button(footer, command=self.on_button_click, text="Evaluate")
-			button.pack(expand=False, side=tk.RIGHT)
-
-		def on_button_click(self, event=None):
-			value = self.entry.get().strip()
-			self.entry.clear()
-			self.console.configure(state=tk.NORMAL)
-			self.console.insert(tk.END, value+"\n")
-			self.console.configure(state=tk.DISABLED)
 
 	class FormWidgetDemoTab(Tab):
 		def __init__(self, notebook:ttk.Notebook):
@@ -355,30 +333,57 @@ if __name__ == '__main__':
 				box_value, boxes_value, radio_value, radios_value
 			))
 
+	class ToolTipTab(Tab):
+		def __init__(self, notebook:ttk.Notebook, ):
+			Tab.__init__(self, notebook, 'Tooltips')
+			header = ttk.Frame(self)
+			header.pack(fill='x',expand=False,side=tk.TOP)
+			self.entry_x = LabeledEntry(header,labeltext='Width',default=5)
+			self.entry_y = LabeledEntry(header,labeltext='Height',default=5)
+			button = ttk.Button(header,text='Rebuild',command=self.remake)
+			for w in (self.entry_x,self.entry_y,button):
+				w.pack(fill='both',expand='true',side=tk.LEFT)
+			self.container = None #placeholder for ttk frame
+			
+		def remake(self,evt=None):
+			if self.container: self.container.destroy()
+			self.container = ttk.Frame(self)
+			self.container.pack(fill='both',expand=True,side=tk.TOP,padx=5,pady=5)
+			width = self.entry_x.get()
+			try:
+				width = int(width)
+			except:
+				self.entry_x.set('Err')
+				return
+			height = self.entry_y.get()
+			try:
+				height = int(height)
+			except:
+				self.entry_y.set('Err')
+				return
+			for y in range(height):
+				f = ttk.Frame(self.container)
+				f.pack(fill='both',expand='true',side=tk.TOP)
+				for x in range(width):
+					val = width*y+x
+					val = f"00{val}" if val < 10 else (f"0{val}" if val < 100 else val)
+					b = ttk.Button(f,text=val,padding=0,width=0,command=lambda val=val:print(f"Pressed {val}"))
+					b.pack(fill='both',expand='true',side=tk.LEFT)
+					ToolTip(b, f'Tooltip for button {val}')
+
 	'''Example Implementation'''
 	class ExampleApp(App):
 		def __init__(self):
 			App.__init__(self, "ini.json")
-			self.console_tab = ConsoleTab(self.notebook)
-			self.textbox_tab = TextBoxTestTab(self.notebook)
-			
-			links = {
-				'Google':'https://www.google.com/',
-				'YouTube':'http://youtu.be/',
-				'Gmail':'https://www.gmail.com/',
-			}
-			self.links = BrowserLauncherTab(self.notebook, "Quick Links", links)
-
-			apps = {
-				"System Info" : ["C:\Windows\System32\msinfo32.exe"],
-				"Winver" : ["C:\Windows\System32\winver.exe"],
-				"Task Manager" : ["C:\Windows\System32\Taskmgr.exe"] #Fails on some systems      
-			}
-			self.apps = CommandLauncherTab(self.notebook, "Applications", apps)
-			self.form = FormWidgetDemoTab(self.notebook)
-			self.combo_tab = ComboRadioTab(self.notebook)
+			self.tooltip_demp = ToolTipTab(self.notebook)
 			self.loading_bar = LoadingBarDemo(self.notebook)
-			
+			self.console_tab = ConsoleTab(self.notebook)
+			self.console_tab.console.command=self.console_tab.console.print
+			self.textbox_tab = TextBoxTestTab(self.notebook)
+			self.links_tab = BrowserLauncherTab(self.notebook, "Quick Links", links)
+			self.apps_tab = CommandLauncherTab(self.notebook, "Applications", apps)
+			self.form_tab = FormWidgetDemoTab(self.notebook)
+			self.combo_tab = ComboRadioTab(self.notebook)
 			
 			self.theme_use('black') #Do this last to apply theme to text boxes
 

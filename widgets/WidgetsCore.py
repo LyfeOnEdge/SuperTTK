@@ -8,7 +8,7 @@ def default_pack(widget, bottom=False): widget.pack(fill='x', expand=False, side
 #Apply a consistent vertical separator
 def default_vertical_separator(f:ttk.Frame,pady=15,padx=10): ttk.Separator(f,orient='vertical').pack(fill='y',padx=padx,pady=pady,expand=False,side=tk.LEFT)
 #apply a consistent packing method to vertical widgets
-def default_vertical_pack(widget,expand=False,padx=0): widget.pack(fill='both',expand=expand,side=tk.LEFT,padx=padx)
+def default_vertical_pack(widget,expand=False,fill='both',padx=0): widget.pack(fill=fill,expand=expand,side=tk.LEFT,padx=padx)
 def copy_to_user_clipboard(widget, value):
 	widget.clipboard_clear()
 	widget.clipboard_append(value)

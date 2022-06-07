@@ -17,7 +17,7 @@ class LabeledEntry(Labeler, ttk.Entry):
 		self.var.set(default)
 		Labeler.__init__(self, parent,labeltext,header=not is_child)
 		ttk.Entry.__init__(self,self.frame,textvariable=self.var)
-		ttk.Entry.pack(self,fill='x',expand=False,side=tk.TOP)
+		ttk.Entry.pack(self,fill='both',expand=True,side=tk.TOP)
 		self.default=default
 		self.is_child=is_child
 		self._command=command
@@ -39,3 +39,11 @@ class LabeledMultiEntry(Labeler, ttk.Frame, MultiWidgetMixin):
 		ttk.Frame.pack(self,fill='both',expand=True,side=tk.TOP)
 		MultiWidgetMixin.__init__(self,LabeledEntry,config)
 		self.is_child = is_child
+
+class LabeledButtonEntry(LabeledEntry):
+	def __init__(self,*args,**kwargs):
+		if not kwargs.get('buttontext'): raise ValueError('LabeledButtonEntry missing required argument "buttontext"')
+		buttontext = kwargs.pop('buttontext')
+		LabeledEntry.__init__(self,*args,**kwargs)
+		self.button = ttk.Button(self, command=self._on_execute_command, text=buttontext)
+		self.button.pack(expand=False, side=tk.RIGHT)
