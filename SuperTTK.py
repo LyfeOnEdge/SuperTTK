@@ -196,7 +196,7 @@ class App(_AbstractAppMixin):  # Main Application Object
             elif entry.is_dir():
                 for subentry in os.scandir(entry.path):
                     if determine_theme(subentry.path):
-                        themes.append(entry.path)
+                        themes.append(subentry.path)
         if verbose:
             print(f"Found {len(themes)} bundled themes: {json.dumps(themes, indent=4)}")
         return themes
@@ -242,7 +242,7 @@ if __name__ == "__main__":
                 on_right_click=self.update_cursor,
                 on_middle_click=self.update_cursor,
             )
-            self.text.pack(fill="both", expand=True, side=tk.TOP)
+            self.text.pack(fill=tk.BOTH, expand=True, side=tk.TOP)
             self.text.insert("1.0", get_lorem_paragraphs(1000))
             self.text.bind("<KeyRelease>", self.update_cursor)
 
