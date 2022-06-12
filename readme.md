@@ -34,3 +34,9 @@ See SuperTTK.py for arguments / example usages
 
 ### Multi Widgets:
 	Labeled Widgets with labeled sub-widgets of a given type
+
+
+
+### Credits:
+
+Sun-Valley-ttk-theme: [MIT] https://github.com/rdbende/Sun-Valley-ttk-theme

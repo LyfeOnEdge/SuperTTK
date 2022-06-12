@@ -3,10 +3,12 @@
     "version": "0.0",
     "width": 400,
     "height": 400,
-    "minwidth": 400,
-    "minheight": 400,
+    "minwidth": 60,
+    "minheight": 60,
     "resizable_width": true,
     "resizable_height": true,
     "start_maximized": false,
+    "start_fullscreen": false,
+    "enable_fullscreen": true,
     "scaling": 1.75
 }
