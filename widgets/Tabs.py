@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from typing import Callable
-from utils.utils import open_link, run_cl
+from .WidgetsCore import open_link, run_cl
 from .ConsoleWidgets import ConsoleWidget
 
 # Tabs add themselves self to their parent notebook

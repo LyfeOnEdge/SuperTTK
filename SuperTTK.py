@@ -25,6 +25,8 @@ if __name__ == "__main__":
         default_vertical_pack,
         copy_to_user_clipboard,
         recursive_widget_search,
+        run_cl,
+        open_link,
     )
     from widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
     from widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
@@ -35,6 +37,7 @@ if __name__ == "__main__":
     from widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
     from widgets.TextWidgets import ScrolledText, CopyBox
     from widgets.ConsoleWidgets import ConsoleWidget
+    from widgets.ListBoxWidgets import Table
     from widgets.Tabs import (
         Tab,
         LauncherTab,
@@ -44,7 +47,7 @@ if __name__ == "__main__":
     )
     from widgets.ToolTip import ToolTip
     from widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
-    from utils.utils import run_cl, open_link
+    from widgets.SizegripWidgets import EasySizegrip
     from utils.lorem_ipsum import get_lorem_paragraphs
 else:
     from .widgets.WidgetsCore import (
@@ -54,6 +57,8 @@ else:
         default_vertical_pack,
         copy_to_user_clipboard,
         recursive_widget_search,
+        run_cl,
+        open_link,
     )
     from .widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
     from .widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
@@ -68,6 +73,7 @@ else:
     from .widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
     from .widgets.TextWidgets import ScrolledText, CopyBox
     from .widgets.ConsoleWidgets import ConsoleWidget
+    from widgets.ListBoxWidgets import Table
     from .widgets.Tabs import (
         Tab,
         LauncherTab,
@@ -77,7 +83,7 @@ else:
     )
     from .widgets.ToolTip import ToolTip
     from .widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
-    from .utils.utils import run_cl, open_link
+    from .widgets.SizegripWidgets import EasySizegrip
     from .utils.lorem_ipsum import get_lorem_paragraphs
 
 
@@ -108,6 +114,7 @@ class App(_AbstractAppMixin):  # Main Application Object
         self.window_min_width = int(self.ini_data.get("minwidth", 300) * self.scaling)
         self.window_min_height = int(self.ini_data.get("minheight", 300) * self.scaling)
         self.window = tk.Tk()
+        self.window.wait_visibility(self.window)
         self.window.tk.call("tk", "scaling", self.ini_data["scaling"])
         self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(fill=tk.BOTH, expand=tk.YES)
@@ -146,12 +153,7 @@ class App(_AbstractAppMixin):  # Main Application Object
         if self.ini_data.get("enable_fullscreen", False):
             self.window.bind("<F11>", self.toggle_full_screen)
         if self.ini_data.get("enable_sizegrip", True):
-            self.grip = ttk.Sizegrip(self.window)
-            self.grip.place(relx=1.0, rely=1.0, anchor="se")
-            self.grip.bind("<ButtonPress-1>", self._on_grip_press)
-            self.grip.bind("<B1-Motion>", self._on_grip_move)
-            self.grip.bind("<ButtonRelease-1>", self._on_grip_release)
-            self.grip["cursor"] = "sizing"
+            self.size_grip = EasySizegrip(self.window)
         self.full_screen_state = False
         self.zoomed_screen_state = False
         self.use_theme("winnative")
@@ -166,21 +168,19 @@ class App(_AbstractAppMixin):  # Main Application Object
 
     def use_theme(self, theme: str):
         self.style.theme_use(theme)
-
-        # Configure the 'header' labels for widgets
         fnt = tkFont.nametofont("TkDefaultFont").actual()
         fnt = (fnt["family"], fnt["size"], "bold")
         self.style.configure("Bold.TLabel", font=fnt)
-
         text_bg = self.style.lookup("TEntry", "fieldbackground") or "white"
         text_fg = self.style.lookup("TEntry", "foreground") or "black"
         widgets = []  # List to populate with scrolled text boxes
         recursive_widget_search(self.notebook, ScrolledText, widgets)
         for w in widgets:
             w.configure(bg=text_bg, fg=text_fg)
-
-        # bg = self.style.lookup('TFrame', 'background') or "white"
         widgets = recursive_widget_search(self.notebook, ScrolledCanvas, [])
+        for w in widgets:
+            w.use_style(self.style)
+        widgets = recursive_widget_search(self.notebook, Table, [])
         for w in widgets:
             w.use_style(self.style)
 
@@ -207,15 +207,6 @@ class App(_AbstractAppMixin):  # Main Application Object
 
     def mainloop(self):
         self.window.mainloop()
-
-    def _on_grip_press(self, event):
-        self.grip["cursor"] = "bottom_right_corner"
-
-    def _on_grip_move(self, event):
-        pass
-
-    def _on_grip_release(self, event):
-        self.grip["cursor"] = "sizing"
 
 
 if __name__ == "__main__":
@@ -642,11 +633,41 @@ if __name__ == "__main__":
                 f"Pos: {event.x} {event.y} | AdjPos: {x}, {y} | Hovered: {t}"
             )
 
+    class TableTab(Tab):
+        def __init__(
+            self,
+            notebook: ttk.Notebook,
+        ):
+            Tab.__init__(self, notebook, "Table")
+            self.table = Table(self)
+            self.table.pack(expand=True, fill=tk.BOTH)
+            vals = [i for i in range(100)]
+            valsB = [f"B{i}" for i in range(100)]
+            valsC = [f"C{i}" for i in range(100)]
+            self.table.build(
+                {
+                    "Label A": vals,
+                    "Label B": valsB,
+                    "Label C": valsC,
+                }
+            )
+            self.footer = ttk.Frame(self)
+            self.footer.pack(side="bottom", fill="x", expand=False)
+            self.info_var = tk.StringVar()
+            default_separator(self.footer, pady=0, padx=0)
+            self.info_label = ttk.Label(self.footer, textvariable=self.info_var)
+            default_pack(self.info_label)
+            self.table.bind_all("<Motion>", self.update)
+
+        def update(self, event):
+            self.info_var.set(f"Pos: {event.x} {event.y}")
+
     class ExampleApp(App):
         """Example Implementation"""
 
         def __init__(self):
             App.__init__(self, "ini.json")
+            self.table_tab = TableTab(self.notebook)
             self.textbox_tab = TextBoxTestTab(self.notebook)
             self.canvas_tab = CanvasTab(self.notebook)
             self.tooltip_demp = ToolTipTab(self.notebook)

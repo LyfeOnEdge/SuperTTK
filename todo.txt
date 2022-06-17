@@ -12,3 +12,8 @@ Radiobutton
 Scrollbar
 Spinbox
 Calendar
+
+
+todo: 
+Separator, Sizegrip,, Notebook and 
+Button, Frame, LabelFrame, Menubutton, PanedWindow, , , and 

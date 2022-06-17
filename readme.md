@@ -1,3 +1,7 @@
+# SuperTTK.py
+
+Simple, quick, easy themed wigets for gui fast-tracking with python
+
 See SuperTTK.py for arguments / example usages 
 
 ### Available widgets (import from SuperTTK.py)
@@ -38,5 +42,3 @@ See SuperTTK.py for arguments / example usages
 
 
 ### Credits:
-
-Sun-Valley-ttk-theme: [MIT] https://github.com/rdbende/Sun-Valley-ttk-theme
