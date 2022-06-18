@@ -46,6 +46,7 @@ if __name__ == "__main__":
         ConsoleTab,
     )
     from widgets.ToolTip import ToolTip
+    from widgets.ResizableCanvas import ResizableCanvas
     from widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
     from widgets.SizegripWidgets import EasySizegrip
     from utils.lorem_ipsum import get_lorem_paragraphs
@@ -73,7 +74,7 @@ else:
     from .widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
     from .widgets.TextWidgets import ScrolledText, CopyBox
     from .widgets.ConsoleWidgets import ConsoleWidget
-    from widgets.ListBoxWidgets import Table
+    from .widgets.ListBoxWidgets import Table
     from .widgets.Tabs import (
         Tab,
         LauncherTab,
@@ -82,6 +83,7 @@ else:
         ConsoleTab,
     )
     from .widgets.ToolTip import ToolTip
+    from .widgets.ResizableCanvas import ResizableCanvas
     from .widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
     from .widgets.SizegripWidgets import EasySizegrip
     from .utils.lorem_ipsum import get_lorem_paragraphs
@@ -135,10 +137,13 @@ class App(_AbstractAppMixin):  # Main Application Object
         self.style = ttk.Style()
         self.available_themes = self.style.theme_names()
         print(f"Available themes: {json.dumps(self.available_themes, indent=4)}")
-        self.theme_menu = tk.Menu(menubar, tearoff=tk.OFF)
-        for t in self.available_themes:
-            self.theme_menu.add_command(label=t, command=lambda t=t: self.use_theme(t))
-        menubar.add_cascade(label="Themes", menu=self.theme_menu)
+        if self.ini_data.get("enable_themes_menu"):
+            self.theme_menu = tk.Menu(menubar, tearoff=tk.OFF)
+            for t in self.available_themes:
+                self.theme_menu.add_command(
+                    label=t, command=lambda t=t: self.use_theme(t)
+                )
+            menubar.add_cascade(label="Themes", menu=self.theme_menu)
         """Window Geometry and Bindings"""
         self.window.geometry(f"{self.window_start_width}x{self.window_start_height}")
         self.window.title(self.version_name)
@@ -154,6 +159,13 @@ class App(_AbstractAppMixin):  # Main Application Object
             self.window.bind("<F11>", self.toggle_full_screen)
         if self.ini_data.get("enable_sizegrip", True):
             self.size_grip = EasySizegrip(self.window)
+        if self.ini_data.get("icon"):
+            icon = self.ini_data.get("icon")
+            if icon.endswith(".ico"):
+                self.window.iconbitmap(icon)
+            else:
+                self.icon = tk.PhotoImage(file=icon)
+                self.window.iconphoto(False, self.icon)
         self.full_screen_state = False
         self.zoomed_screen_state = False
         self.use_theme("winnative")
@@ -168,20 +180,22 @@ class App(_AbstractAppMixin):  # Main Application Object
 
     def use_theme(self, theme: str):
         self.style.theme_use(theme)
+
+        # Configure the 'header' labels for widgets
         fnt = tkFont.nametofont("TkDefaultFont").actual()
         fnt = (fnt["family"], fnt["size"], "bold")
         self.style.configure("Bold.TLabel", font=fnt)
+
         text_bg = self.style.lookup("TEntry", "fieldbackground") or "white"
         text_fg = self.style.lookup("TEntry", "foreground") or "black"
-        widgets = []  # List to populate with scrolled text boxes
-        recursive_widget_search(self.notebook, ScrolledText, widgets)
-        for w in widgets:
+
+        for w in recursive_widget_search(self.window, ScrolledText, []):
             w.configure(bg=text_bg, fg=text_fg)
-        widgets = recursive_widget_search(self.notebook, ScrolledCanvas, [])
-        for w in widgets:
+
+        for w in recursive_widget_search(self.window, Table, []):
             w.use_style(self.style)
-        widgets = recursive_widget_search(self.notebook, Table, [])
-        for w in widgets:
+
+        for w in recursive_widget_search(self.window, ScrolledCanvas, []):
             w.use_style(self.style)
 
     def get_themes_list(self, verbose=False):

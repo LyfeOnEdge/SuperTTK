@@ -19,8 +19,6 @@ class ResizableCanvas(Canvas):
 
     def on_resize(self, event):
         self.resize(self.width, self.height, event.width, event.height)
-        if self.___on_configure:
-            self.___on_configure(event)
 
     def refresh(self):
         self.resize(

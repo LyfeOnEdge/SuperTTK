@@ -58,7 +58,7 @@ class CopyBox(ttk.Frame):  # Not as clean but doesn't have the same packing issu
         ttk.Frame.__init__(self, parent)
         self.button = ttk.Button(self, text="Copy to Clipboard", command=self.on_click)
         self.button.pack(side=tk.BOTTOM, fill="x", expand=False, pady=(0, 5))
-        self.text = ScrolledText(self, **kw)
+        self.text = ScrolledText(self, textkw=kw)
         self.text.pack(side=tk.TOP, fill="both", expand=True)
         self.get, self.set, self.clear = self.text.get, self.text.set, self.text.clear
 

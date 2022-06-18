@@ -92,11 +92,22 @@ class ScrolledCanvas(ttk.Frame):
             self.on_right_click(event, (event.x, self.get_adjusted_y_view(event)))
 
     def _on_configure(self, event=None):
-        self.refresh()
+        if hasattr(self, 'refresh'):
+            self.refresh()
         w, h = self.winfo_width(), self.winfo_height()
         self.canvas.config(width=w, height=h)
         if self.on_configure:
             self.on_configure(w, h)
+            
+    def use_style(self, sty):
+        self.tile_fill = sty.lookup("TEntry", "fieldbackground") or sty.lookup(
+            "TCombobox", "fieldbackground"
+        )
+        bg = sty.lookup("TFrame", "background") or "#ffffff"
+        self.canvas.config(bg=bg)
+        if hasattr(self, 'refresh'):
+            self.refresh()
+
 
 
 class TiledCanvas(ScrolledCanvas):
@@ -273,15 +284,6 @@ class TiledCanvas(ScrolledCanvas):
                 self.on_tile_right_click(tile)
 
         self._on_action(event, on_find_action=on_right_click)
-
-    def use_style(self, sty):
-        self.tile_fill = sty.lookup("TEntry", "fieldbackground") or sty.lookup(
-            "TCombobox", "fieldbackground"
-        )
-        bg = sty.lookup("TFrame", "background") or "#ffffff"
-        self.canvas.config(bg=bg)
-        self.refresh()
-
 
 class BaseTile:
     def __init__(self, manager, text):
