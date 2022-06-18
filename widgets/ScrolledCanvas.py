@@ -17,6 +17,7 @@ class ScrolledCanvas(ttk.Frame):
         on_middle_click=None,  # If specified, calls func(event)
         on_right_click=None,  # If specified, calls func(event)
         on_configure=None,  # If specified, calls func(event)
+        bind_canvas_scroll=True,
         **kw,  # Canvas args
     ):
         self.on_mouse_enter = on_mouse_enter
@@ -51,6 +52,7 @@ class ScrolledCanvas(ttk.Frame):
         self.canvas.bind("<Button-3>", self._on_right_click)
         self.canvas.bind("<MouseWheel>", self._on_mouse_wheel)
         self.canvas.bind("<Configure>", self._on_configure)
+        self.bind_canvas_scroll = bind_canvas_scroll
 
     def get_adjusted_y_view(self, event):
         return int(event.y + (float(self.canvas.yview()[0]) * self.canvas_height))
@@ -75,7 +77,8 @@ class ScrolledCanvas(ttk.Frame):
     def _on_mouse_wheel(self, event):
         if self.on_mouse_wheel:
             self.on_mouse_wheel(event)
-        _on_mousewheel(event, self.canvas)
+        if self.bind_canvas_scroll:
+            _on_mousewheel(event, self.canvas)
 
     def _on_left_click(self, event):
         y = self.get_adjusted_y_view(event)
@@ -92,22 +95,21 @@ class ScrolledCanvas(ttk.Frame):
             self.on_right_click(event, (event.x, self.get_adjusted_y_view(event)))
 
     def _on_configure(self, event=None):
-        if hasattr(self, 'refresh'):
+        if hasattr(self, "refresh"):
             self.refresh()
         w, h = self.winfo_width(), self.winfo_height()
         self.canvas.config(width=w, height=h)
         if self.on_configure:
             self.on_configure(w, h)
-            
+
     def use_style(self, sty):
         self.tile_fill = sty.lookup("TEntry", "fieldbackground") or sty.lookup(
             "TCombobox", "fieldbackground"
         )
         bg = sty.lookup("TFrame", "background") or "#ffffff"
         self.canvas.config(bg=bg)
-        if hasattr(self, 'refresh'):
+        if hasattr(self, "refresh"):
             self.refresh()
-
 
 
 class TiledCanvas(ScrolledCanvas):
@@ -284,6 +286,7 @@ class TiledCanvas(ScrolledCanvas):
                 self.on_tile_right_click(tile)
 
         self._on_action(event, on_find_action=on_right_click)
+
 
 class BaseTile:
     def __init__(self, manager, text):

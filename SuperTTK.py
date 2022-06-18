@@ -23,6 +23,7 @@ if __name__ == "__main__":
         default_pack,
         default_vertical_separator,
         default_vertical_pack,
+        force_aspect,
         copy_to_user_clipboard,
         recursive_widget_search,
         run_cl,
@@ -56,6 +57,7 @@ else:
         default_pack,
         default_vertical_separator,
         default_vertical_pack,
+        force_aspect,
         copy_to_user_clipboard,
         recursive_widget_search,
         run_cl,
@@ -111,13 +113,17 @@ class App(_AbstractAppMixin):  # Main Application Object
         with open(ini_file) as f:
             _AbstractAppMixin.__init__(self, json.load(f))
         self.scaling = self.ini_data["scaling"]
-        self.window_start_width = int(self.ini_data["width"] * self.scaling)
-        self.window_start_height = int(self.ini_data["height"] * self.scaling)
-        self.window_min_width = int(self.ini_data.get("minwidth", 300) * self.scaling)
-        self.window_min_height = int(self.ini_data.get("minheight", 300) * self.scaling)
+        scale_startsize = self.ini_data.get("scale_startsize", False)
+        scale_factor = self.scaling if scale_startsize else 1
+        self.window_start_width = int(self.ini_data["width"] * scale_factor)
+        self.window_start_height = int(self.ini_data["height"] * scale_factor)
+        scale_minsize = self.ini_data.get("scale_minsize", False)
+        scale_factor = self.scaling if scale_minsize else 1
+        self.window_min_width = int(self.ini_data.get("minwidth", 300) * scale_factor)
+        self.window_min_height = int(self.ini_data.get("minheight", 300) * scale_factor)
         self.window = tk.Tk()
         self.window.wait_visibility(self.window)
-        self.window.tk.call("tk", "scaling", self.ini_data["scaling"])
+        self.window.tk.call("tk", "scaling", self.scaling)
         self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(fill=tk.BOTH, expand=tk.YES)
         menubar = tk.Menu(self.window)
@@ -168,6 +174,7 @@ class App(_AbstractAppMixin):  # Main Application Object
                 self.window.iconphoto(False, self.icon)
         self.full_screen_state = False
         self.zoomed_screen_state = False
+        self.default_font = tkFont.nametofont("TkDefaultFont").actual()
         self.use_theme("winnative")
 
     def toggle_maximized(self, event=None):
@@ -182,7 +189,7 @@ class App(_AbstractAppMixin):  # Main Application Object
         self.style.theme_use(theme)
 
         # Configure the 'header' labels for widgets
-        fnt = tkFont.nametofont("TkDefaultFont").actual()
+        self.default_font = fnt = tkFont.nametofont("TkDefaultFont").actual()
         fnt = (fnt["family"], fnt["size"], "bold")
         self.style.configure("Bold.TLabel", font=fnt)
 

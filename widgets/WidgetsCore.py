@@ -8,6 +8,26 @@ import tkinter as tk
 from tkinter import ttk
 
 
+def force_aspect(inner_frame, outer_frame, ratio=(16 / 9)):
+    def force_ratio(event):
+        w = event.width
+        h = int(event.width / ratio)
+        if h > event.height:
+            h = event.height
+            w = int(event.height * ratio)
+        inner_frame.place(
+            in_=outer_frame,
+            relx=0.5,
+            rely=0.5,
+            x=-0.5 * float(w),
+            y=-0.5 * float(h),
+            width=w,
+            height=h,
+        )
+
+    outer_frame.bind("<Configure>", force_ratio)
+
+
 def timer_decorator(proc):
     def t(*args, **kw):
         start = time.time()
