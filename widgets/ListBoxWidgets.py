@@ -18,17 +18,18 @@ class ScrolledListBox(Scroller, tk.Listbox, SuperWidgetMixin):
 
 
 class Table(ttk.Frame):
-    def __init__(self, *args, **kw):
+    def __init__(self, *args, min_column_width=100, start_column_width=100, **kw):
         # self.on_selection_event = None
         # if "on_selection_event" in kw:
         #     self.on_selection_event = kw.pop("on_selection_event")
         ttk.Frame.__init__(self, *args, **kw)
         self.scrollbar = ttk.Scrollbar(self)
         self.scrollbar.config(command=self.on_scroll_bar)
-        self.scrollbar.place(relx=1, relheight=1, width=20, x=-20)
-        self.listbox_frame = ttk.Frame(self)
-        self.listbox_frame.place(relheight=1, relwidth=1, width=-20)
+        self.scrollbar.pack(side=tk.RIGHT,expand=False,fill='y')
+        self.listbox_frame = tk.PanedWindow(self, orient=tk.HORIZONTAL)
+        self.listbox_frame.pack(side=tk.LEFT,expand=True,fill=tk.BOTH)
         self.listboxes, self.categories, self.labels = {}, [], []
+        self.min_column_width, self.start_column_width = min_column_width, start_column_width
 
     def clear(self):
         for lb in self.listboxes:
@@ -43,21 +44,30 @@ class Table(ttk.Frame):
         ratio = 1 / len(self.categories)
         i = 0
         for title in contents:
+            pane_frame = ttk.Frame(self.listbox_frame)
+            pane_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
             l = ttk.Label(
-                self.listbox_frame,
+                pane_frame,
                 text=title,
                 style="Bold.TLabel",
+                anchor="w"
             )
-            l.place(relx=i * ratio, relwidth=ratio, height=20)
+            # l.place(relx=i * ratio, relwidth=ratio, height=20)
+            l.pack(side=tk.TOP,expand=False,fill='x')
             self.labels.append(l)
             lb = self.listboxes[title] = tk.Listbox(
-                self.listbox_frame,
+                pane_frame,
                 borderwidth=1,
                 highlightthickness=0,
                 exportselection=0,
                 yscrollcommand=self.scrollbar.set,
             )
-            lb.place(relx=i * ratio, relwidth=ratio, relheight=1, y=20, height=-20)
+            lb.pack(side=tk.LEFT,expand=True,fill=tk.BOTH, ipadx=(40))
+            self.listbox_frame.add(pane_frame)
+            self.listbox_frame.paneconfigure(pane_frame, minsize=self.min_column_width, width=self.start_column_width)
+            # self.listbox_frame.configure(pane_frame,minsize=10)
+            # self.nametowidget(self.listbox_frame.panes()[0])['minsize']
+            # lb.place(relx=i * ratio, relwidth=ratio, relheight=1, y=20, height=-20)
             lb.bind("<<ListboxSelect>>", self.on_selection)
             lb.bind("<ButtonPress-1>", self.on_press)
             for item in contents[title]:
@@ -129,6 +139,8 @@ class Table(ttk.Frame):
         for lb in self.listboxes:
             self.listboxes[lb].config(bg=bg)
             self.listboxes[lb].config(fg=fg)
+
+        self.listbox_frame.configure(bg=bg)
 
     def get(self):
         lb = self.listboxes[self.categories[0]]

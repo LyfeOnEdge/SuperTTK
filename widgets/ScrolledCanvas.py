@@ -116,7 +116,7 @@ class TiledCanvas(ScrolledCanvas):
     def __init__(
         self,
         *args,
-        tile_width=100,
+        tile_width=400,
         tile_height=100,
         tile_padx=5,
         tile_pady=5,
@@ -126,6 +126,7 @@ class TiledCanvas(ScrolledCanvas):
         on_tile_left_click=None,
         on_tile_middle_click=None,
         on_tile_right_click=None,
+        override_tile_width=False,
         **kw,
     ):
         ScrolledCanvas.__init__(self, *args, **kw)
@@ -140,6 +141,7 @@ class TiledCanvas(ScrolledCanvas):
         self.on_tile_left_click = on_tile_left_click
         self.on_tile_middle_click = on_tile_middle_click
         self.on_tile_right_click = on_tile_right_click
+        self.override_tile_width = override_tile_width
         self.hovered = None
         self.canvas.bind("<Motion>", self.__on_mouse_move)
         self.canvas.bind("<Button-1>", self.__on_left_click)
@@ -155,7 +157,10 @@ class TiledCanvas(ScrolledCanvas):
         maxperrow = framewidth // (self.tile_width + self.tile_padx)
         # If there's not enough room to build anything
         if not maxperrow:
-            return  # print("Not_enough_room")
+            if self.override_tile_width:
+                maxperrow = 1
+            else:
+                return  # print("Not_enough_room")
         maxwidth = (maxperrow) * self.tile_width + maxperrow * self.tile_padx
         filler_space = framewidth - maxwidth
         try:

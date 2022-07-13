@@ -1,42 +1,39 @@
-# deep_black.tcl -
+# console_green.tcl -
 # based on black.tcl
 #   Experimental!
 #
 #  Copyright (c) 2007-2008 Mats Bengtsson
-#  Background color modified to be darker by Andrew Spangler
+#  Background color modified to actually be black by Andrew Spangler
 # $Id: black.tcl,v 1.2 2009/10/25 19:21:30 oberdorfer Exp $
 
 package require Tk
 
-namespace eval ttk::theme::deep_black {
+namespace eval ttk::theme::console_green {
   variable version 0.0.1
   variable dir [file dirname [info script]]
-
-  package provide ttk::theme::deep_black $version
-
-  # NB: These colors must be in sync with the ones in black.rdb
-
+  package provide ttk::theme::console_green $version
   variable colors
   array set colors {
-      -disabledfg "#a9a9a9"
-      -frame      "#000000"
-      -dark       "#222222"
-      -darker     "#111111"
-      -darkest    "#000000"
-      -lighter    "#626262"
-      -lightest   "#ffffff"
-      -selectbg   "#222222"
-      -selectfg   "#ffffff"
+        -fg         "#00ff00"
+        -disabledfg "#a9a9a9"
+        -frame      "#000000"
+        -dark       "#222222"
+        -darker     "#111111"
+        -darkest    "#000000"
+        -lighter    "#626262"
+        -lightest   "#ffffff"
+        -selectbg   "#222222"
+        -selectfg   "#ffffff"
       }
 
-  ttk::style theme create deep_black -parent clam -settings {
+  ttk::style theme create console_green -parent clam -settings {
 
-    # -----------------------------------------------------------------
-    # Theme defaults
-    #
+    # # -----------------------------------------------------------------
+    # # Theme defaults
+    # #
     ttk::style configure . \
         -background $colors(-frame) \
-        -foreground #ffffff \
+        -foreground $colors(-fg) \
         -bordercolor $colors(-darkest) \
         -darkcolor $colors(-dark) \
         -lightcolor $colors(-lighter) \
@@ -52,7 +49,7 @@ namespace eval ttk::theme::deep_black {
         active $colors(-lighter)] \
         -foreground [list disabled $colors(-disabledfg)] \
         -selectbackground [list  !focus $colors(-darkest)] \
-        -selectforeground [list  !focus #ffffff]
+        -selectforeground [list  !focus $colors(-fg)]
 
     # ttk widgets.
     ttk::style configure TButton \
@@ -66,16 +63,16 @@ namespace eval ttk::theme::deep_black {
 
     ttk::style configure TEntry \
         -fieldbackground #626262 \
-        -foreground #ffffff \
-        -insertbackground #ffffff \
+        -foreground $colors(-fg) \
+        -insertbackground $colors(-fg) \
         -padding {2 0}
     ttk::style configure TCombobox \
         -fieldbackground #626262 \
-        -foreground #ffffff \
+        -foreground $colors(-fg) \
         -padding {2 0}
     ttk::style configure TSpinbox \
         -fieldbackground #626262 \
-        -foreground #ffffff
+        -foreground $colors(-fg)
 
     ttk::style configure TNotebook.Tab \
         -padding {4 2 4 2}
@@ -87,7 +84,7 @@ namespace eval ttk::theme::deep_black {
 
     ttk::style configure TreeCtrl \
         -background gray30 -itembackground {gray60 gray50} \
-        -itemfill #ffffff -itemaccentfill yellow
+        -itemfill $colors(-fg) -itemaccentfill yellow
   }
 }
 
@@ -95,14 +92,14 @@ namespace eval ttk::theme::deep_black {
 
 namespace eval ::tablelist:: {
 
-  proc deep_blackTheme {} {
+  proc console_greenTheme {} {
     variable themeDefaults
 
-    array set colors [array get ttk::theme::deep_black::colors]
+    array set colors [array get ttk::theme::console_green::colors]
 
     array set themeDefaults [list \
       -background      "#000000" \
-      -foreground      "#ffffff" \
+      -foreground      $colors(-fg) \
       -disabledforeground $colors(-disabledfg) \
       -stripebackground      "#191919" \
       -selectbackground      "#4a6984" \

@@ -64,7 +64,7 @@ def _create_container(func):
     place the scrollbars and the widget."""
 
     def wrapped(cls, parent, **kw):
-        container = tk.Frame(parent)
+        container = ttk.Frame(parent)
         container.bind("<Enter>", lambda e: _bound_to_mousewheel(e, container))
         container.bind("<Leave>", lambda e: _unbound_to_mousewheel(e, container))
         return func(cls, container, **kw)

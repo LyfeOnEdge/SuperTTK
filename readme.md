@@ -42,3 +42,5 @@ See SuperTTK.py for arguments / example usages
 
 
 ### Credits:
+
+OPEN SANS FONT: https://fonts.google.com/specimen/Open+Sans (Apache 2 License)

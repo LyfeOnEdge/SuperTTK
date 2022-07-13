@@ -26,8 +26,10 @@ if __name__ == "__main__":
         force_aspect,
         copy_to_user_clipboard,
         recursive_widget_search,
+        complex_widget_search,
         run_cl,
         open_link,
+        WINDOWS_SYMBOL,
     )
     from widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
     from widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
@@ -39,12 +41,15 @@ if __name__ == "__main__":
     from widgets.TextWidgets import ScrolledText, CopyBox
     from widgets.ConsoleWidgets import ConsoleWidget
     from widgets.ListBoxWidgets import Table
+    from widgets.TreeviewWidgets import TreeTable
     from widgets.Tabs import (
         Tab,
         LauncherTab,
         BrowserLauncherTab,
         CommandLauncherTab,
         ConsoleTab,
+        TableTab,
+        TreeTableTab,
     )
     from widgets.ToolTip import ToolTip
     from widgets.ResizableCanvas import ResizableCanvas
@@ -60,8 +65,10 @@ else:
         force_aspect,
         copy_to_user_clipboard,
         recursive_widget_search,
+        complex_widget_search,
         run_cl,
         open_link,
+        WINDOWS_SYMBOL,
     )
     from .widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
     from .widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
@@ -77,12 +84,15 @@ else:
     from .widgets.TextWidgets import ScrolledText, CopyBox
     from .widgets.ConsoleWidgets import ConsoleWidget
     from .widgets.ListBoxWidgets import Table
+    from .widgets.TreeviewWidgets import TreeTable
     from .widgets.Tabs import (
         Tab,
         LauncherTab,
         BrowserLauncherTab,
         CommandLauncherTab,
         ConsoleTab,
+        TableTab,
+        TreeTableTab,
     )
     from .widgets.ToolTip import ToolTip
     from .widgets.ResizableCanvas import ResizableCanvas
@@ -133,7 +143,7 @@ class App(_AbstractAppMixin):  # Main Application Object
         self.themes = self.get_themes_list(verbose=True)
         print(f"Loading bundled themes...")
         for t in self.themes.copy():
-            print(f"Loading {t}...")
+            print(f"\tLoading {t}...")
             try:
                 self.window.tk.call("source", t)
             except:
@@ -187,22 +197,26 @@ class App(_AbstractAppMixin):  # Main Application Object
 
     def use_theme(self, theme: str):
         self.style.theme_use(theme)
-
         # Configure the 'header' labels for widgets
         self.default_font = fnt = tkFont.nametofont("TkDefaultFont").actual()
-        fnt = (fnt["family"], fnt["size"], "bold")
-        self.style.configure("Bold.TLabel", font=fnt)
-
+        self.bold_font = (fnt["family"], fnt["size"], "bold")
+        bg = self.style.lookup("TFrame", "background") or "#ffffff"
+        text_fg = self.style.lookup("TEntry", "foreground") or "#000000"
         text_bg = self.style.lookup("TEntry", "fieldbackground") or "white"
-        text_fg = self.style.lookup("TEntry", "foreground") or "black"
-
-        for w in recursive_widget_search(self.window, ScrolledText, []):
+        self.style.configure("Bold.TLabel", font=self.bold_font)
+        self.style.configure(
+            "Treeview", background=bg, fieldbackground=bg, foreground=text_fg
+        )
+        self.style.configure("Treeview.Heading", relief="groove")
+        # Search GUI tree towards branches, updating certain elements that otherwise don't work with ttk
+        widgets = complex_widget_search(
+            self.window, (ScrolledText, ScrolledCanvas, Table)
+        )
+        for w in widgets[ScrolledText]:
             w.configure(bg=text_bg, fg=text_fg)
-
-        for w in recursive_widget_search(self.window, Table, []):
+        for w in widgets[ScrolledCanvas]:
             w.use_style(self.style)
-
-        for w in recursive_widget_search(self.window, ScrolledCanvas, []):
+        for w in widgets[Table]:
             w.use_style(self.style)
 
     def get_themes_list(self, verbose=False):
@@ -228,6 +242,9 @@ class App(_AbstractAppMixin):  # Main Application Object
 
     def mainloop(self):
         self.window.mainloop()
+
+    def bell(self):
+        self.window.bell()
 
 
 if __name__ == "__main__":
@@ -635,7 +652,10 @@ if __name__ == "__main__":
         ):
             Tab.__init__(self, notebook, "Canvas")
             self.canvas = TiledCanvas(
-                self, on_mouse_move=self.update, on_tile_left_click=print
+                self,
+                on_mouse_move=self.update,
+                on_tile_left_click=print,
+                override_tile_width=True,
             )
             self.footer = ttk.Frame(self)
             self.footer.pack(side="bottom", fill="x", expand=False)
@@ -654,41 +674,26 @@ if __name__ == "__main__":
                 f"Pos: {event.x} {event.y} | AdjPos: {x}, {y} | Hovered: {t}"
             )
 
-    class TableTab(Tab):
-        def __init__(
-            self,
-            notebook: ttk.Notebook,
-        ):
-            Tab.__init__(self, notebook, "Table")
-            self.table = Table(self)
-            self.table.pack(expand=True, fill=tk.BOTH)
-            vals = [i for i in range(100)]
-            valsB = [f"B{i}" for i in range(100)]
-            valsC = [f"C{i}" for i in range(100)]
-            self.table.build(
-                {
-                    "Label A": vals,
-                    "Label B": valsB,
-                    "Label C": valsC,
-                }
+    class DemoTableTab(TreeTableTab):
+        def __init__(self, notebook):
+            data = {
+                "Label A": [i for i in range(100)],
+                "Label B": [f"B{i}" for i in range(100)],
+                "Label C": [f"C{i}" for i in range(100)],
+            }
+            TreeTableTab.__init__(
+                self, notebook, "Table", table_contents=data, min_column_width=100
             )
-            self.footer = ttk.Frame(self)
-            self.footer.pack(side="bottom", fill="x", expand=False)
-            self.info_var = tk.StringVar()
-            default_separator(self.footer, pady=0, padx=0)
-            self.info_label = ttk.Label(self.footer, textvariable=self.info_var)
-            default_pack(self.info_label)
-            self.table.bind_all("<Motion>", self.update)
 
-        def update(self, event):
-            self.info_var.set(f"Pos: {event.x} {event.y}")
+    
 
     class ExampleApp(App):
         """Example Implementation"""
 
         def __init__(self):
             App.__init__(self, "ini.json")
-            self.table_tab = TableTab(self.notebook)
+            self.chat_tab = ChatTab(self.notebook, self)
+            self.table_tab = DemoTableTab(self.notebook)
             self.textbox_tab = TextBoxTestTab(self.notebook)
             self.canvas_tab = CanvasTab(self.notebook)
             self.tooltip_demp = ToolTipTab(self.notebook)
@@ -699,6 +704,7 @@ if __name__ == "__main__":
             self.apps_tab = CommandLauncherTab(self.notebook, "Applications", apps)
             self.form_tab = FormWidgetDemoTab(self.notebook)
             self.combo_tab = ComboRadioTab(self.notebook)
+
             self.use_theme("black")  # Do this last to apply theme to text boxes
 
     app = ExampleApp()

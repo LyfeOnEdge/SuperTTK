@@ -5,7 +5,8 @@ from tkinter import ttk
 from typing import Callable
 from .WidgetsCore import open_link, run_cl
 from .ConsoleWidgets import ConsoleWidget
-
+from .ListBoxWidgets import Table
+from .TreeviewWidgets import TreeTable
 
 # Tabs add themselves self to their parent notebook
 class Tab(ttk.Frame):
@@ -43,3 +44,39 @@ class ConsoleTab(Tab):
         Tab.__init__(self, notebook, "Console")
         self.console = ConsoleWidget(self, **kwargs)
         self.console.pack(fill="both", expand=True)
+
+
+class ScrolledButtonTab(Tab):
+    def __init__(self, notebook: ttk.Notebook, title: str, options: dict):
+        Tab.__init__(self, notebook, title)
+        self.buttons = ScrolledButtons(self)
+        self.buttons.pack(fill="both", expand=True)
+
+class TableTab(Tab):
+    def __init__(
+        self,
+        notebook: ttk.Notebook,
+        title: str,
+        table_contents: dict,
+        **kw
+    ):
+        Tab.__init__(self, notebook, title)
+        self.table = Table(self, **kw)
+        self.table.pack(expand=True, fill=tk.BOTH)
+        self.table.build(table_contents)
+        self.info_var = tk.StringVar()
+
+class TreeTableTab(Tab):
+    def __init__(
+        self,
+        notebook: ttk.Notebook,
+        title: str,
+        table_contents:dict={},
+        # options: dict,
+        **kw
+    ):
+        Tab.__init__(self, notebook, title)
+        self.table = TreeTable(self, table_contents=table_contents,**kw)
+        self.table.pack(expand=True, fill=tk.BOTH)
+        # self.table.build(options)
+        # self.info_var = tk.StringVar()

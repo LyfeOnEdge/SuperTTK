@@ -67,3 +67,16 @@ class CopyBox(ttk.Frame):  # Not as clean but doesn't have the same packing issu
         self.clipboard_clear()
         self.clipboard_append(self.get())
         self.after(1000, lambda: self.button.configure(text="Copy To Clipboard"))
+
+
+# text = tk.Text(root)
+# text.pack(side="left")
+# sb = tk.Scrollbar(root, command=text.yview)
+# sb.pack(side="right")
+# text.configure(yscrollcommand=sb.set)
+# ...
+# for i in range(10):
+#     button = tk.Button(text, ...)
+#     text.window_create("end", window=button)
+#     text.insert("end", "\n")
+# text.configure(state="disabled"

@@ -7,6 +7,7 @@ import webbrowser
 import tkinter as tk
 from tkinter import ttk
 
+WINDOWS_SYMBOL = "⊞"
 
 def force_aspect(inner_frame, outer_frame, ratio=(16 / 9)):
     def force_ratio(event):
@@ -80,9 +81,24 @@ def recursive_widget_search(node_widget, widget_type_to_find, found_list=[]):
     return found_list  # The only time this return is ever used is at the end of the first call
 
 
+def complex_widget_search(node_widget, widget_types_to_find:list, found_lists={}):
+    """
+    A more robust version of the widget search with lists for multiple widget types found in one go
+    """
+    if not found_lists:
+        for w in widget_types_to_find:
+            found_lists[w]=[]
+    for w in node_widget.winfo_children():
+        for wt in widget_types_to_find:
+            if isinstance(w, wt):
+                if not found_lists.get(wt):
+                    found_lists[wt]=[]  
+                found_lists[wt].append(w)
+        complex_widget_search(w, widget_types_to_find, found_lists)
+    return found_lists  # The only time this return is ever used is at the end of the first call
+
 def reduce(v):
     return max(0, min(v, 255))
-
 
 def rgb_to_hex(rgb):
     return "#{0:02x}{1:02x}{2:02x}".format(
