@@ -11,5 +11,7 @@
     "start_fullscreen": false,
     "enable_fullscreen": true,
     "scaling": 1.75,
-    "enable_themes_menu": true
+    "enable_themes_menu": true,
+    "enable_users": true,
+    "movable_tabs": true
 }

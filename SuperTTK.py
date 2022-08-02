@@ -17,99 +17,21 @@ from tkinter import ttk
 from typing import Callable
 from math import sin
 
+
 if __name__ == "__main__":
-    from widgets.WidgetsCore import (
-        default_separator,
-        default_pack,
-        default_vertical_separator,
-        default_vertical_pack,
-        force_aspect,
-        copy_to_user_clipboard,
-        recursive_widget_search,
-        complex_widget_search,
-        run_cl,
-        open_link,
-        WINDOWS_SYMBOL,
-    )
-    from widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
-    from widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
-    from widgets.OptionMenuWidgets import LabeledOptionMenu, LabeledMultiOptionMenu
-    from widgets.EntryWidgets import LabeledEntry, LabeledMultiEntry, LabeledButtonEntry
-    from widgets.ProgressbarWidgets import LabeledProgressbar, LabeledMultiProgressbar
-    from widgets.ScaleWidgets import LabeledScale, LabeledMultiScale
-    from widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
-    from widgets.TextWidgets import ScrolledText, CopyBox
-    from widgets.ConsoleWidgets import ConsoleWidget
-    from widgets.ListBoxWidgets import Table
-    from widgets.TreeviewWidgets import TreeTable
-    from widgets.Tabs import (
-        Tab,
-        LauncherTab,
-        BrowserLauncherTab,
-        CommandLauncherTab,
-        ConsoleTab,
-        TableTab,
-        TreeTableTab,
-    )
-    from widgets.ToolTip import ToolTip
-    from widgets.ResizableCanvas import ResizableCanvas
-    from widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
-    from widgets.SizegripWidgets import EasySizegrip
-    from utils.lorem_ipsum import get_lorem_paragraphs
+    from SuperLib import *
 else:
-    from .widgets.WidgetsCore import (
-        default_separator,
-        default_pack,
-        default_vertical_separator,
-        default_vertical_pack,
-        force_aspect,
-        copy_to_user_clipboard,
-        recursive_widget_search,
-        complex_widget_search,
-        run_cl,
-        open_link,
-        WINDOWS_SYMBOL,
-    )
-    from .widgets.CheckbuttonWidgets import LabeledCheckbutton, LabeledMultiCheckbutton
-    from .widgets.ComboboxWidgets import LabeledCombobox, LabeledMultiCombobox
-    from .widgets.OptionMenuWidgets import LabeledOptionMenu, LabeledMultiOptionMenu
-    from .widgets.EntryWidgets import (
-        LabeledEntry,
-        LabeledMultiEntry,
-        LabeledButtonEntry,
-    )
-    from .widgets.ProgressbarWidgets import LabeledProgressbar, LabeledMultiProgressbar
-    from .widgets.ScaleWidgets import LabeledScale, LabeledMultiScale
-    from .widgets.RadiobuttonWidgets import LabeledRadiobutton, LabeledMultiRadiobutton
-    from .widgets.TextWidgets import ScrolledText, CopyBox
-    from .widgets.ConsoleWidgets import ConsoleWidget
-    from .widgets.ListBoxWidgets import Table
-    from .widgets.TreeviewWidgets import TreeTable
-    from .widgets.Tabs import (
-        Tab,
-        LauncherTab,
-        BrowserLauncherTab,
-        CommandLauncherTab,
-        ConsoleTab,
-        TableTab,
-        TreeTableTab,
-    )
-    from .widgets.ToolTip import ToolTip
-    from .widgets.ResizableCanvas import ResizableCanvas
-    from .widgets.ScrolledCanvas import ScrolledCanvas, TiledCanvas, BaseTile
-    from .widgets.SizegripWidgets import EasySizegrip
-    from .utils.lorem_ipsum import get_lorem_paragraphs
+    from .SuperLib import *
 
 
-def get_themes_folder():
-    return os.path.join(os.path.abspath(os.path.dirname(__file__)), "themes")
+class _AbstractAppMixin:
+    """Init code unrelated to GUI control, handles ini.json loading."""
 
-
-class _AbstractAppMixin:  # Non-functional code, etc
-    def __init__(self, ini_data: dict):
-        self.ini_data = ini_data
-        self.app_name = ini_data.get("application")
-        self.version = ini_data.get("version")
+    def __init__(self, ini_file: str):
+        with open(ini_file) as f:
+            self.ini_data = json.load(f)
+        self.app_name = self.ini_data.get("application")
+        self.version = self.ini_data.get("version")
         self.version_name = "{} Version {}".format(self.app_name, self.version)
         self.os = platform.system()
         self.os_version = platform.version()
@@ -118,29 +40,45 @@ class _AbstractAppMixin:  # Non-functional code, etc
         print("Using tkinter version {}".format(tk.Tcl().eval("info patchlevel")))
 
 
-class App(_AbstractAppMixin):  # Main Application Object
-    def __init__(self, ini_file: str):  # ini_file is the path to an ini.json file
-        with open(ini_file) as f:
-            _AbstractAppMixin.__init__(self, json.load(f))
+class App(_AbstractAppMixin):
+    """Main Application Object"""
+
+    def __init__(self, ini_file: str):
+        """ini_file is the path to an ini.json file"""
+        _AbstractAppMixin.__init__(self, ini_file)
         self.scaling = self.ini_data["scaling"]
+        print(f"Application scaling factor - {self.scaling}")
         scale_startsize = self.ini_data.get("scale_startsize", False)
         scale_factor = self.scaling if scale_startsize else 1
-        self.window_start_width = int(self.ini_data["width"] * scale_factor)
-        self.window_start_height = int(self.ini_data["height"] * scale_factor)
+        self.window_start_width = int(self.ini_data["width"] * scale_factor) or 1
+        self.window_start_height = int(self.ini_data["height"] * scale_factor) or 1
+        print(
+            f"Window start size - {self.window_start_width} x {self.window_start_height}"
+        )
         scale_minsize = self.ini_data.get("scale_minsize", False)
         scale_factor = self.scaling if scale_minsize else 1
         self.window_min_width = int(self.ini_data.get("minwidth", 300) * scale_factor)
         self.window_min_height = int(self.ini_data.get("minheight", 300) * scale_factor)
-        self.window = tk.Tk()
+        print(f"Window min size - {self.window_min_width} x {self.window_min_height}")
+        self.window = tk.Tk()  # Instantiate tk instance.
+        self.focused_window = None  # Placeholder
+        enable_dpi_awareness(self, self.scaling)  # Enable Windows DPI Scaling
         self.window.wait_visibility(self.window)
         self.window.tk.call("tk", "scaling", self.scaling)
+
+        # This toolkit is designed around the idea of "Tabs"
+        # This is the highest level tab available.
         self.notebook = ttk.Notebook(self.window)
         self.notebook.pack(fill=tk.BOTH, expand=tk.YES)
-        menubar = tk.Menu(self.window)
-        self.window.configure(menu=menubar)
-        """Theme"""
+
+        # Add a shared menu
+        self.menu = tk.Menu(self.window)
+        self.window.configure(menu=self.menu)
+
+        # Application Theming
+        self.current_theme = "winnative"
         print(f"Themes folder located at {get_themes_folder()}")
-        self.themes = self.get_themes_list(verbose=True)
+        self.themes = get_bundled_themes_list(verbose=True)
         print(f"Loading bundled themes...")
         for t in self.themes.copy():
             print(f"\tLoading {t}...")
@@ -151,18 +89,40 @@ class App(_AbstractAppMixin):  # Main Application Object
                 continue
         print(f"Finished loading bundled themes...")
         self.style = ttk.Style()
-        self.available_themes = self.style.theme_names()
+        self.ignored_themes = self.ini_data.get("ignored_themes", [])
+        self.available_themes = []
+        for t in self.style.theme_names():
+            if not t in self.ignored_themes:
+                self.available_themes.append(t)
+        ignored = json.dumps(self.ignored_themes, indent=4)
+        print(f"Ignored themes: {ignored}")
         print(f"Available themes: {json.dumps(self.available_themes, indent=4)}")
         if self.ini_data.get("enable_themes_menu"):
-            self.theme_menu = tk.Menu(menubar, tearoff=tk.OFF)
+            self.theme_menu = tk.Menu(self.menu, tearoff=tk.OFF)
             for t in self.available_themes:
                 self.theme_menu.add_command(
                     label=t, command=lambda t=t: self.use_theme(t)
                 )
-            menubar.add_cascade(label="Themes", menu=self.theme_menu)
-        """Window Geometry and Bindings"""
+            self.menu.add_cascade(label="Themes", menu=self.theme_menu)
+
+        # User Profiles
+        self.profiles_enabled = False
+        if self.ini_data.get("enable_users", False):
+            self.profiles_enabled = True
+            self.profiles = ProfilesSystem()
+            print("User profiles enabled")
+            # Add Profiles section to menu
+            prof_menu = tk.Menu(self.menu, tearoff=0)
+            prof_menu.add_command(label="New Profile", command=self.create_profile)
+            prof_menu.add_command(label="Select Profile", command=self.select_profile)
+            self.menu.add_cascade(menu=prof_menu, label="Profiles")
+        if self.profiles.profiles:
+            print(f"Found existing profiles")
+            print(f"Loading most recently used profile")
+            self._select_profile(self.profiles.get_last_used_profile())
+
+        # Window Geometry and Bindings
         self.window.geometry(f"{self.window_start_width}x{self.window_start_height}")
-        self.window.title(self.version_name)
         self.window.minsize(width=self.window_min_width, height=self.window_min_height)
         resizable_width = self.ini_data.get("resizable_width", True)
         resizable_height = self.ini_data.get("resizable_height", True)
@@ -171,39 +131,134 @@ class App(_AbstractAppMixin):  # Main Application Object
             if self.ini_data.get("start_maximized", False):
                 self.window.state("zoomed")  # Maximize window
             self.window.bind("<F10>", self.toggle_maximized)
+            print("F10 toggles maximized")
         if self.ini_data.get("enable_fullscreen", False):
             self.window.bind("<F11>", self.toggle_full_screen)
+            print("F11 toggles fullscreen")
         if self.ini_data.get("enable_sizegrip", True):
             self.size_grip = EasySizegrip(self.window)
+            print("Sizegrip enabled")
+        if self.ini_data.get("movable_tabs", False):
+            enable_notebook_movement(self)
+            print("Notebook tab movement enabled")
         if self.ini_data.get("icon"):
             icon = self.ini_data.get("icon")
             if icon.endswith(".ico"):
                 self.window.iconbitmap(icon)
+                print("Set window bitmap icon")
             else:
                 self.icon = tk.PhotoImage(file=icon)
                 self.window.iconphoto(False, self.icon)
+                print("Set window icon")
         self.full_screen_state = False
         self.zoomed_screen_state = False
-        self.default_font = tkFont.nametofont("TkDefaultFont").actual()
-        self.use_theme("winnative")
+        self.default_font = fnt = tkFont.nametofont("TkDefaultFont").actual()
+        self.bold_font = (fnt["family"], fnt["size"], "bold")
+        self.small_font = (fnt["family"], int(fnt["size"]) - 2, "normal")
+        self.small_bold_font = (fnt["family"], int(fnt["size"]) - 2, "bold")
+        self.large_font = (fnt["family"], int(fnt["size"]) + 2, "normal")
+        self.large_bold_font = (fnt["family"], int(fnt["size"]) + 2, "bold")
+        theme = self.current_theme
+        if self.profiles_enabled:
+            profile = self.profiles.current_profile
+            if profile:
+                pref = profile.get_preference("theme")
+                theme = pref or theme
+        self.use_theme(theme)
+        self.update_default_title()
+
+    def create_profile(self, name: str = None):
+        """Calling with no name brings up a popup, the popup calls this function \
+again with name kw which instead makes a new profile or asks again for a name if \
+the supplied name was invalid"""
+        if self.focused_window:
+            self.focused_window.destroy()
+        if not name:
+            self.focused_window = PromptWindow(
+                window=self.window,
+                text="Enter New Profile Name",
+                on_yes=self.create_profile,
+                yes_text="Make New Profile",
+            )
+        else:
+            self.profiles.create_profile(name)
+            self.update_default_title()
+
+    def select_profile(self, name: str = None):
+        """Calling with no name brings up a popup, the popup calls this function \
+again with the name which instead calls the Profiles System to use a certain profile"""
+        if self.focused_window:
+            self.focused_window.destroy()
+        if not name:
+            self.focused_window = ListWindow(
+                window=self.window,
+                title="Select Profile",
+                text="Select Profile",
+                on_yes=self.select_profile,
+                options=reversed(list(u.username for u in self.profiles.profiles)),
+            )
+        else:
+            self.profiles.select_profile_by_username(name)
+            self.update_default_title()
+            self.apply_profile(self.profiles.current_profile)
+
+    def _select_profile(self, profile: UserProfile):
+        self.profiles.select_profile(profile)
+        self.update_default_title()
+        self.apply_profile(profile)
+
+    def apply_profile(self, profile: UserProfile):
+        """Apply settings from the current profile. For more complicated profile systems \
+override this function."""
+        theme = profile.get_preference("theme")
+        if not theme:
+            print("User had invalid theme selected in profile, repairing...")
+            profile.set_preference("theme", "default")
+        self.use_theme(profile.get_preference("theme"))
 
     def toggle_maximized(self, event=None):
+        """Toggles maximized window."""
         self.zoomed_screen_state = not self.zoomed_screen_state
         self.window.state("normal" if self.zoomed_screen_state else "zoomed")
 
     def toggle_full_screen(self, event=None):
+        """Toggles full screen."""
         self.full_screen_state = not self.full_screen_state
         self.window.attributes("-fullscreen", self.full_screen_state)
 
-    def use_theme(self, theme: str):
+    def use_theme(self, theme: str = None, verbose: bool = False):
+        """Updates the app to use a certain theme."""
+        if not theme:
+            theme = self.current_theme
+        if self.profiles_enabled:
+            if self.profiles.current_profile:
+                self.profiles.current_profile.set_preference("theme", theme)
+                self.profiles.current_profile.save()
+            else:
+                print(
+                    f"Profiles are enabled but no profile is selected. Themes will not be saved until a profile is created."
+                )
+        self.current_theme = theme
         self.style.theme_use(theme)
-        # Configure the 'header' labels for widgets
         self.default_font = fnt = tkFont.nametofont("TkDefaultFont").actual()
         self.bold_font = (fnt["family"], fnt["size"], "bold")
+        self.small_font = (fnt["family"], int(fnt["size"]) - 2, "normal")
+        self.small_bold_font = (fnt["family"], int(fnt["size"]) - 2, "bold")
+        self.large_font = (fnt["family"], int(fnt["size"]) + 2, "normal")
+        self.large_bold_font = (fnt["family"], int(fnt["size"]) + 2, "bold")
         bg = self.style.lookup("TFrame", "background") or "#ffffff"
         text_fg = self.style.lookup("TEntry", "foreground") or "#000000"
         text_bg = self.style.lookup("TEntry", "fieldbackground") or "white"
         self.style.configure("Bold.TLabel", font=self.bold_font)
+        self.style.configure(
+            "NoPad.TButton",
+            padding=0,
+            ipadding=0,
+            padx=0,
+            pady=0,
+            borderwidth=0,
+            highlightthickness=0,
+        )
         self.style.configure(
             "Treeview", background=bg, fieldbackground=bg, foreground=text_fg
         )
@@ -219,32 +274,29 @@ class App(_AbstractAppMixin):  # Main Application Object
         for w in widgets[Table]:
             w.use_style(self.style)
 
-    def get_themes_list(self, verbose=False):
-        def determine_theme(fp):
-            return fp.endswith(".tcl") and not fp.endswith("pkgIndex.tcl")
-
-        themes = []
-        for entry in os.scandir(get_themes_folder()):
-            if entry.is_file():
-                if determine_theme(entry.path):
-                    themes.append(entry.path)
-            elif entry.is_dir():
-                for subentry in os.scandir(entry.path):
-                    if determine_theme(subentry.path):
-                        themes.append(subentry.path)
-        if verbose:
-            print(f"Found {len(themes)} bundled themes: {json.dumps(themes, indent=4)}")
-        return themes
-
     def copy_to_user_clipboard(self, val: str):
         self.window.clipboard_clear()
         self.window.clipboard_append(val)
 
-    def mainloop(self):
-        self.window.mainloop()
-
     def bell(self):
+        """Largely redundant as all widgets have access to this method"""
         self.window.bell()
+
+    def update_default_title(self, indicate_profile=True):
+        """Update the window title with the default string, optionally with a profile indicator."""
+        title = self.version_name
+        if indicate_profile and self.profiles_enabled:
+            if self.profiles.current_profile:
+                title += f" - {self.profiles.current_profile.username}"
+        self.window.title(title)
+
+    def update_title(self, title):
+        """Updates the window title"""
+        self.window.title(self.version_name)
+
+    def mainloop(self):
+        """Starts the application mainloop"""
+        self.window.mainloop()
 
 
 if __name__ == "__main__":
@@ -276,7 +328,7 @@ if __name__ == "__main__":
             self.text.bind("<KeyRelease>", self.update_cursor)
 
             self.footer = ttk.Frame(self)
-            self.footer.pack(side="bottom", fill="x", expand=False)
+            self.footer.pack(side=tk.BOTTOM, fill="x", expand=False)
 
             self.cursor_x, self.cursor_y = self.text.get_cursor().split(".")
 
@@ -343,7 +395,7 @@ if __name__ == "__main__":
             self.check_button = LabeledCheckbutton(
                 self,
                 "Labeled Check Button",
-                buttontext="Button Text",
+                text="Button Text",
                 replace_output=["Unchecked", "Checked"],
                 default=True,
             )
@@ -352,14 +404,14 @@ if __name__ == "__main__":
                 "Int Button": (
                     [],
                     {
-                        "buttontext": "This button will return an int",
+                        "text": "This button will return an int",
                         "replace_output": [0, 1],
                     },
                 ),
                 "Bool Button": (
                     [],
                     {
-                        "buttontext": "This button will return a bool",
+                        "text": "This button will return a bool",
                         "default": True,
                         "replace_output": [False, True],
                     },
@@ -367,7 +419,7 @@ if __name__ == "__main__":
                 "String Button": (
                     [],
                     {
-                        "buttontext": "This button will return a string",
+                        "text": "This button will return a string",
                         "replace_output": ["Unchecked", "Checked"],
                     },
                 ),
@@ -382,7 +434,7 @@ if __name__ == "__main__":
             default_pack(run_button)
 
             self.copy_box = CopyBox(self)
-            self.copy_box.pack(fill="both", expand=True, padx=5)
+            self.copy_box.pack(fill=tk.BOTH, expand=True, padx=5)
 
         def on_button_click(self, event=None):
             entry_value = self.entry.get()
@@ -580,7 +632,7 @@ if __name__ == "__main__":
             default_pack(run_button)
 
             self.copy_box = CopyBox(self)
-            self.copy_box.pack(fill="both", expand=True, padx=5)
+            self.copy_box.pack(fill=tk.BOTH, expand=True, padx=5)
 
         def on_button_click(self, event=None):
             box_value = self.box.get()
@@ -609,14 +661,14 @@ if __name__ == "__main__":
             self.entry_y = LabeledEntry(header, labeltext="Height", default=5)
             button = ttk.Button(header, text="Rebuild", command=self.remake)
             for w in (self.entry_x, self.entry_y, button):
-                w.pack(fill="both", expand="true", side=tk.LEFT)
+                w.pack(fill=tk.BOTH, expand="true", side=tk.LEFT)
             self.container = None  # placeholder for ttk frame
 
         def remake(self, evt=None):
             if self.container:
                 self.container.destroy()
             self.container = ttk.Frame(self)
-            self.container.pack(fill="both", expand=True, side=tk.TOP, padx=5, pady=5)
+            self.container.pack(fill=tk.BOTH, expand=True, side=tk.TOP, padx=5, pady=5)
             width = self.entry_x.get()
             try:
                 width = int(width)
@@ -631,7 +683,7 @@ if __name__ == "__main__":
                 return
             for y in range(height):
                 f = ttk.Frame(self.container)
-                f.pack(fill="both", expand="true", side=tk.TOP)
+                f.pack(fill=tk.BOTH, expand="true", side=tk.TOP)
                 for x in range(width):
                     val = width * y + x
                     val = f"00{val}" if val < 10 else (f"0{val}" if val < 100 else val)
@@ -642,7 +694,7 @@ if __name__ == "__main__":
                         width=0,
                         command=lambda val=val: print(f"Pressed {val}"),
                     )
-                    b.pack(fill="both", expand="true", side=tk.LEFT)
+                    b.pack(fill=tk.BOTH, expand="true", side=tk.LEFT)
                     ToolTip(b, f"Tooltip for button {val}")
 
     class CanvasTab(Tab):
@@ -658,13 +710,13 @@ if __name__ == "__main__":
                 override_tile_width=True,
             )
             self.footer = ttk.Frame(self)
-            self.footer.pack(side="bottom", fill="x", expand=False)
-            self.canvas.pack(fill="both", expand=True)
+            self.footer.pack(side=tk.BOTTOM, fill="x", expand=False)
+            self.canvas.pack(fill=tk.BOTH, expand=True)
             self.info_var = tk.StringVar()
             default_separator(self.footer, pady=0, padx=0)
             self.info_label = ttk.Label(self.footer, textvariable=self.info_var)
             default_pack(self.info_label)
-            self.canvas.tiles = [BaseTile(self.canvas, i) for i in range(1000)]
+            self.canvas.tiles = [ExampleTile(self.canvas, i) for i in range(1000)]
             self.canvas.refresh()
 
         def update(self, event, pos):
@@ -673,6 +725,12 @@ if __name__ == "__main__":
             self.info_var.set(
                 f"Pos: {event.x} {event.y} | AdjPos: {x}, {y} | Hovered: {t}"
             )
+
+    class PasswordEntryTab(Tab):
+        def __init__(self, notebook, *args, **kwargs):
+            Tab.__init__(self, notebook, "Password Entry")
+            self.password_entry = PasswordEntry(self)
+            self.password_entry.pack(fill=tk.BOTH, expand=False, padx=10, pady=10)
 
     class DemoTableTab(TreeTableTab):
         def __init__(self, notebook):
@@ -685,27 +743,83 @@ if __name__ == "__main__":
                 self, notebook, "Table", table_contents=data, min_column_width=100
             )
 
-    
+    class PopupsTab(Tab):
+        def __init__(self, notebook, app):
+            Tab.__init__(self, notebook, "Popup Windows")
+
+            def on_yes(*args):
+                print(f"Yes - {args}")
+
+            def on_no(*args):
+                print(f"No - {args}")
+
+            def on_cancel(*args):
+                print(f"Cancel - {args}")
+
+            notice = lambda: NoticeWindow(text="Hello", window=app.window)
+            prompt = lambda: PromptWindow(
+                text="Hello", on_yes=on_yes, on_cancel=on_cancel, window=app.window
+            )
+            yesno = lambda: YesNoCancelWindow(
+                text="Hello",
+                on_yes=on_yes,
+                on_no=on_no,
+                on_cancel=on_cancel,
+                window=app.window,
+            )
+            password = lambda: PasswordWindow(
+                window=app.window,
+                instruction_text="Logging in to nothing, this is a test...",
+            )
+
+            for b in [
+                ttk.Button(self, text="Notice Window", command=notice),
+                ttk.Button(self, text="YesNo Window", command=yesno),
+                ttk.Button(self, text="Prompt Window", command=prompt),
+                ttk.Button(self, text="Password Window", command=password),
+            ]:
+                b.pack(side=tk.TOP, fill="x", padx=10, pady=0)
+
+    class GifTab(Tab):
+        def __init__(self, notebook):
+            Tab.__init__(self, notebook, "GIF Viewer")
+            self.gif = GifLoader(get_asset("test.gif"))
+            self.viewer = GifViewer(self.gif, self)
+            self.viewer.pack(fill=tk.BOTH, expand=True)
+
+    class PillowTab(Tab):
+        def __init__(self, notebook: ttk.Notebook):
+            Tab.__init__(self, notebook, "Pillow Widgets")
+            self.notebook = ttk.Notebook(self)
+            self.notebook.pack(fill=tk.BOTH, expand=True)
+
+            self.gif_tab = GifTab(self.notebook)
 
     class ExampleApp(App):
         """Example Implementation"""
 
         def __init__(self):
             App.__init__(self, "ini.json")
-            self.chat_tab = ChatTab(self.notebook, self)
+
+            if PILLOW_AVAILABLE:
+                self.pillow_tab = PillowTab(self.notebook)
+            self.note_tab = NotesTab(self.notebook, self)
+            self.chat_tab = ConversationsTab(self.notebook, self)
             self.table_tab = DemoTableTab(self.notebook)
             self.textbox_tab = TextBoxTestTab(self.notebook)
             self.canvas_tab = CanvasTab(self.notebook)
             self.tooltip_demp = ToolTipTab(self.notebook)
             self.loading_bar = LoadingBarDemo(self.notebook)
-            self.console_tab = ConsoleTab(self.notebook)
-            self.console_tab.console.command = self.console_tab.console.print
             self.links_tab = BrowserLauncherTab(self.notebook, "Quick Links", links)
             self.apps_tab = CommandLauncherTab(self.notebook, "Applications", apps)
             self.form_tab = FormWidgetDemoTab(self.notebook)
             self.combo_tab = ComboRadioTab(self.notebook)
+            self.popups_tab = PopupsTab(self.notebook, self)
+            self.password_tab = PasswordEntryTab(self.notebook)
+            self.console_tab = ConsoleTab(self.notebook)
+            self.console_tab.console.command = self.console_tab.console.print
 
-            self.use_theme("black")  # Do this last to apply theme to text boxes
+            self.use_theme()  # Do this last to apply theme to text boxes
 
     app = ExampleApp()
     app.mainloop()
