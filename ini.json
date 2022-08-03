@@ -13,5 +13,6 @@
     "scaling": 1.75,
     "enable_themes_menu": true,
     "enable_users": true,
-    "movable_tabs": true
+    "movable_tabs": true,
+    "icon": "./assets/favicon.png"
 }
