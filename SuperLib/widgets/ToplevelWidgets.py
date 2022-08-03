@@ -104,7 +104,7 @@ class YesNoCancelWindow(FocusedToplevel):
             ttk.Button(button_frame, text=no_text, command=self._on_no).pack(
                 side=tk.LEFT, expand=True
             )
-        if cancel_enabled:
+        if yes_enabled:
             ttk.Button(button_frame, text=yes_text, command=self._on_yes).pack(
                 side=tk.LEFT, expand=True
             )

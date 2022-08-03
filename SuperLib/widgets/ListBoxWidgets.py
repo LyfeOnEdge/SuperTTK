@@ -54,6 +54,8 @@ class Table(ttk.Frame):
         for l in self.labels:
             l.destroy()
         self.listboxes, self.categories, self.labels = {}, [], []
+        for w in self.listbox_frame.winfo_children():
+            w.destroy()
 
     def build(self, contents: dict):
         """Rebuild the table"""
@@ -65,7 +67,6 @@ class Table(ttk.Frame):
             pane_frame = ttk.Frame(self.listbox_frame)
             pane_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
             l = ttk.Label(pane_frame, text=title, style="Bold.TLabel", anchor="w")
-            # l.place(relx=i * ratio, relwidth=ratio, height=20)
             l.pack(side=tk.TOP, expand=False, fill="x")
             self.labels.append(l)
             lb = self.listboxes[title] = tk.Listbox(
@@ -80,9 +81,6 @@ class Table(ttk.Frame):
             self.listbox_frame.paneconfigure(
                 pane_frame, minsize=self.min_column_width, width=self.start_column_width
             )
-            # self.listbox_frame.configure(pane_frame,minsize=10)
-            # self.nametowidget(self.listbox_frame.panes()[0])['minsize']
-            # lb.place(relx=i * ratio, relwidth=ratio, relheight=1, y=20, height=-20)
             lb.bind("<<ListboxSelect>>", self._on_selection)
             lb.bind("<ButtonPress-1>", self._on_press)
             for item in contents[title]:

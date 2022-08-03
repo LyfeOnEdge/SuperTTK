@@ -11,7 +11,7 @@ import os
 import typing
 import platform
 import subprocess
-import tkinter as tk 
+import tkinter as tk
 import tkinter.font as tkFont
 from tkinter import ttk
 from typing import Callable
@@ -97,6 +97,13 @@ class App(_AbstractAppMixin):
         ignored = json.dumps(self.ignored_themes, indent=4)
         print(f"Ignored themes: {ignored}")
         print(f"Available themes: {json.dumps(self.available_themes, indent=4)}")
+        if self.ini_data.get("enable_themes_menu"):
+            self.theme_menu = tk.Menu(self.menu, tearoff=tk.OFF)
+            for t in self.available_themes:
+                self.theme_menu.add_command(
+                    label=t, command=lambda t=t: self.use_theme(t)
+                )
+            self.menu.add_cascade(label="Themes", menu=self.theme_menu)
 
         # User Profiles
         self.profiles_enabled = False
@@ -105,6 +112,11 @@ class App(_AbstractAppMixin):
             self.profiles = ProfilesSystem()
             print("User profiles enabled")
             # Add Profiles section to menu
+            prof_menu = tk.Menu(self.menu, tearoff=0)
+            prof_menu.add_command(label="New Profile", command=self.create_profile)
+            prof_menu.add_command(label="Select Profile", command=self.select_profile)
+            prof_menu.add_command(label="Profile Manager", command = lambda: ProfilesWindow(self))
+            self.menu.add_cascade(menu=prof_menu, label="Profiles")
             print(f"Found existing profiles")
             print(f"Loading most recently used profile")
             self._select_profile(self.profiles.get_last_used_profile())
@@ -132,11 +144,11 @@ class App(_AbstractAppMixin):
         if self.ini_data.get("icon"):
             icon = self.ini_data.get("icon")
             if icon.endswith(".ico"):
-                self.window.iconbitmap(default=icon)
+                self.window.iconbitmap(icon)
                 print("Set window bitmap icon")
             else:
                 self.icon = tk.PhotoImage(file=icon)
-                self.window.iconphoto(True, self.icon)
+                self.window.iconphoto(False, self.icon)
                 print("Set window icon")
         self.full_screen_state = False
         self.zoomed_screen_state = False
@@ -146,22 +158,6 @@ class App(_AbstractAppMixin):
         self.small_bold_font = (fnt["family"], int(fnt["size"]) - 2, "bold")
         self.large_font = (fnt["family"], int(fnt["size"]) + 2, "normal")
         self.large_bold_font = (fnt["family"], int(fnt["size"]) + 2, "bold")
-        
-        # Application Menu
-        if self.profiles_enabled:
-            prof_menu = tk.Menu(self.menu, tearoff=0)
-            prof_menu.add_command(label="New Profile", command=self.create_profile)
-            prof_menu.add_command(label="Select Profile", command=self.select_profile)
-            prof_menu.add_command(label="Profile Manager", command = lambda: ProfilesWindow(self))
-            self.menu.add_cascade(menu=prof_menu, label="Profiles")
-        if self.ini_data.get("enable_themes_menu"):
-            self.theme_menu = tk.Menu(self.menu, tearoff=tk.OFF)
-            for t in self.available_themes:
-                self.theme_menu.add_command(
-                    label=t, command=lambda t=t: self.use_theme(t)
-                )
-            self.menu.add_cascade(label="Themes", menu=self.theme_menu)
-
         theme = self.current_theme
         if self.profiles_enabled:
             profile = self.profiles.current_profile
@@ -184,8 +180,6 @@ the supplied name was invalid"""
             )
         else:
             self.profiles.create_profile(name)
-            self.profiles.current_profile.set_preference("theme", "default")
-            self.use_theme("default")
             self.update_default_title()
 
     def select_profile(self, name: str = None):

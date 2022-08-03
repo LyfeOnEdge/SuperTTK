@@ -288,7 +288,7 @@ class BaseBubbleTab(Tab):
             )
             b = self.canvas.bbox(text)
             width, height = b[2] - b[0], b[3] - b[1]
-            bg = self.canvas.draw_round_rectangle(
+            bg = self.canvas.create_round_rectangle(
                 left_align + BUBBLE_SIDE_SPACING - TEXT_X_PADDING,
                 running_total_height,
                 right_align - TEXT_Y_PADDING,
@@ -558,7 +558,7 @@ class ChatTab(BaseBubbleTab):
                 "trash": trash,
                 "pin": pin,
                 "copy": copy,
-                "outline": self.canvas.draw_round_rectangle(
+                "outline": self.canvas.create_round_rectangle(
                     *m.bbox, width=HOVER_WIDTH
                 ),
                 "date": dat,

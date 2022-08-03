@@ -75,9 +75,10 @@ class UserProfile:
         self.save()
 
 class ProfilesSystem:
-    def __init__(self, select_profile_actions:list=[], profiles_dir:str=get_profiles_folder(), handle_duplicates:bool=True):
+    def __init__(self, select_profile_actions:list=[], refresh_profiles_actions:list=[], profiles_dir:str=get_profiles_folder(), handle_duplicates:bool=True):
         """select_profile_actions is a list of callbacks to call when the selected profile changes."""
         self.select_profile_actions = select_profile_actions
+        self.refresh_profiles_actions = refresh_profiles_actions
         self.profiles_dir = profiles_dir
         self.current_profile = None
         self.profiles = []
@@ -112,6 +113,24 @@ class ProfilesSystem:
     def clear_select_profile_actions(self, new:list=[]):
         """Clear out the profile switch actions, optionally replacing them with new ones"""
         self.select_profile_actions=new.copy()
+    def handle_select_profile_actions(self):
+        """Handle on-profile-selection actions"""
+        for action in self.select_profile_actions:
+            action(self.current_profile)
+            
+    def add_refresh_profiles_action(self, action):
+        """Add an action to the profiles list refresh actions"""
+        self.refresh_profiles_actions.append(action)
+    def add_refresh_profiles_actions(self, actions:list):
+        """Add a list of actions to the profiles list refresh actions"""
+        self.refresh_profiles_actions.extend(actions)
+    def clear_refresh_profile_actions(self, new:list=[]):
+        """Clear out the profiles list refresh actions, optionally replacing them with new ones"""
+        self.refresh_profiles_actions=new.copy()
+    def handle_refresh_profiles_actions(self):
+        """Handle on-refresh-profiles actions"""
+        for action in self.refresh_profiles_actions:
+            action(self.current_profile)
     
     def select_profile(self, profile:UserProfile):
         """Change the currently selected profile"""
@@ -122,27 +141,29 @@ class ProfilesSystem:
         self.current_profile = profile
         profile.data["last_accessed"]=get_unix_timestamp()
         profile.save()
-        for action in self.select_profile_actions:
-            action(profile)
+        self.handle_select_profile_actions()
 
-    def select_profile_by_username(self, name:str):
-        print(f"Looking for {name}")
+    def get_profile_by_username(self, name: str):
+        print(f"Looking for profile - {name}")
         prof = None
         for p in self.profiles:
             if p.username == name:
                 prof = p
                 break
         if prof:
-            print(f"Selecting {prof.username}")
-            self.select_profile(prof)
+            return prof
         else:
             raise ValueError(f"Unable to find profile")
+
+
+    def select_profile_by_username(self, name:str):
+        self.select_profile(self.get_profile_by_username(name))
 
     def create_profile(self, name:str):
         """Creates a profile with a given name. `Raises ValueError` if the profile name already exists. `Returns a UserProfile`"""
         for p in self.profiles:
             if p.username == name:
-                raise ValueError(f"A profile of name ")
+                raise ValueError(f"A profile of name {name} already exists.")
         self.current_profile = UserProfile(self.profiles_dir, name, get_unix_timestring())
         self.profiles.append(self.current_profile)
         return self.current_profile
@@ -192,6 +213,23 @@ its name untouched. `Returns None`"""
                         break
                     index += 1
         self.profiles=self.sort_profiles_by_accessed()
+
+    def get_profile_names(self):
+        """Returns an alphabetically sorted list of profile names"""
+        return list(sorted(p.username for p in self.profiles))
+
+    def delete_profile(self, profile:UserProfile):
+        if not profile in self.profiles:
+            raise ValueError("Attempted to delete profile that is not in the profiles list.")
+        if profile is self.current_profile:
+            raise ValueError("Attempted to the currently selected profile. Make a new profile in order to delete this one.")
+        self.profiles.remove(profile)
+        os.remove(profile.path)
+        self.handle_refresh_profiles_actions()
+        
+        
+
+    
 
 PROFILES_OBJECTS = [
     ProfilesSystem,

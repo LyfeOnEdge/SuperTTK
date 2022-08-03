@@ -124,6 +124,7 @@ from .utils.scaling import enable_dpi_awareness
 from .utils.ProfilesSystem import ProfilesSystem, UserProfile, get_profiles_folder, get_profiles_list, PROFILES_OBJECTS, PROFILES_FUNCTIONS
 from .mega_widgets.chat import ConversationsTab
 from .mega_widgets.notes import NotesTab
+from .mega_widgets.profile_manager import ProfilesWindow
 
 CANVAS_WIDGETS = [ResizableCanvas, ScrolledCanvas, TiledCanvas, ExampleTile]
 TOPLEVEL_WIDGETS = [

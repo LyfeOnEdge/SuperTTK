@@ -69,6 +69,7 @@ os.makedirs(NOTES_FOLDER, exist_ok=True)
 
 
 def get_notes_list():
+    """Gets a list of paths to note files from the Notes diretory."""
     notes = []
     for entry in os.scandir(NOTES_FOLDER):
         if entry.is_file():
@@ -79,6 +80,7 @@ def get_notes_list():
 
 
 class Notepad:
+    """Core Notepad instance."""
     def __init__(self, title, atomic, notes=[]):
         self.title, self.atomic, self.notes = title, atomic, notes
         self.note_path = os.path.join(NOTES_FOLDER, atomic + NOTE_FILE_ENDING)
