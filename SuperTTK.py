@@ -130,12 +130,12 @@ class App(_AbstractAppMixin):
             enable_notebook_movement(self)
             print("Notebook tab movement enabled")
         if self.ini_data.get("icon"):
-            self.icon = self.ini_data.get("icon")
-            if self.icon.endswith(".ico"):
-                self.window.iconbitmap(default=self.icon)
+            icon = self.ini_data.get("icon")
+            if icon.endswith(".ico"):
+                self.window.iconbitmap(default=icon)
                 print("Set window bitmap icon")
             else:
-                self.icon = tk.PhotoImage(file=self.icon)
+                self.icon = tk.PhotoImage(file=icon)
                 self.window.iconphoto(True, self.icon)
                 print("Set window icon")
         self.full_screen_state = False
