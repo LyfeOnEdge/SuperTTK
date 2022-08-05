@@ -6,6 +6,7 @@ from ..widgets.ComboboxWidgets import LabeledCombobox
 from ..widgets.TextWidgets import CopyBox
 from ..widgets.WidgetsCore import default_pack
 from ..widgets.ListBoxWidgets import Table
+from ..utils.HTML_Generator import HTML_Generator
 
 MODULE_PREFIX="Shopping."
 
@@ -62,7 +63,7 @@ class ShoppingList(ttk.Frame):
         clr_button = ttk.Button(sel_col, text="Clear cart list", command=self.clear_shopping_list)
         default_pack(clr_button)
 
-        export_button = ttk.Button(self, text="Export Shopping List")        
+        export_button = ttk.Button(self, text="Export Shopping List", command=self.export_html)        
         export_button.pack(side=tk.BOTTOM, pady=10, padx=10, fill="x")
         self.update()
         
@@ -80,7 +81,6 @@ class ShoppingList(ttk.Frame):
             prof.data["preferences"][MODULE_PREFIX+"cart"]=self.shopping_list
             prof.save()
             
-
     def update_favorites(self):
         self.favorites_list.clear()
         self.source_favorites_list = sorted(self.source_favorites_list)
@@ -108,7 +108,7 @@ class ShoppingList(ttk.Frame):
             self.shopping_list.remove(item[0])
         self.update()
         
-    def add_to_favorites_list(self, item):
+    def add_to_favorites_list(self, item:str):
         item=item.strip()
         if item and not item in self.source_favorites_list:
             self.source_favorites_list.append(item)
@@ -126,16 +126,20 @@ class ShoppingList(ttk.Frame):
             self.source_favorites_list.remove(fav)
         self.update()
         
-    
-    def export_txt(self):
-        pass
-
-    def export_json(self):
-        pass
-
     def export_html(self):
-        pass
-
-    def export_csv(self):
-        pass
-
+        print("Exporting Shopping List")
+        generator = HTML_Generator()
+        r = len(self.shopping_list)
+        for i in range(r):
+            generator.start_div()
+            generator.add_center('<input type="checkbox" class="larger">')
+            generator.add_center(f'<h1>{str(self.shopping_list[i])}</h1>')
+            if i < r-1:
+                generator.end_div()
+                generator.add_divider()
+        print(generator.assemble())
+        import tempfile
+        file = tempfile.NamedTemporaryFile(mode="w+", delete=False, suffix=".html")
+        generator.save(file.name)
+        import webbrowser
+        webbrowser.open(file.name)

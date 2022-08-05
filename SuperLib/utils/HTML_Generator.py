@@ -1,7 +1,28 @@
 INTRO = """
 Auto-Generated with SuperTTK
 """
-
+STYLE = """
+<style>
+html { filter: invert(1); }
+body {
+  background-color: linen;
+}
+div {
+  background-color: #cccccc;
+  padding: 10px;
+  border-radius: 80px;
+}
+input.larger {
+    width: 30px;
+    height: 30px;
+    padding: 0px;
+}
+.general-theme {
+  background: #222220;
+  color: #ddd;
+}
+</style>
+"""
 
 class HTML_Generator:
     def __init__(self, indent="\t"):
@@ -14,6 +35,7 @@ class HTML_Generator:
         self.current_depth += 1
         self.head += self.get_indent() + '<meta charset="utf-8">\n'
         self.current_depth -= 1
+        self.head += STYLE
         self.head += self.get_indent() + "</head>\n"
         self.body_start = self.get_indent() + "<body>\n"
         self.body = ""
@@ -123,15 +145,36 @@ class HTML_Generator:
     def add_divider(self):
         self.body += self.get_indent() + "<hr>\n"
 
+    # LIST
+    def start_list(self, items=[], ordered=False):
+        self.body += self.get_indent() + "<ol>" if ordered else "<ul>" + "\n"
+        self.current_depth += 1
+        for i in items:
+            self.add_list_item(i)
+        
+    def add_list(self, items=[], ordered=False):
+        self.start_list(items=items, ordered=ordered)
+        self.end_list(ordered=ordered)
+
+    def end_list(self, ordered=False):
+        self.current_depth -= 1
+        self.body += self.get_indent() + "</ol>" if ordered else "</ul>" + "\n"
+
+    def add_list_item(self, item:str):
+        self.body += self.get_indent() + f"<li>{item}</li>\n"
 
 if __name__ == "__main__":
     import webbrowser
 
     generator = HTML_Generator()
-    for i in range(50):
-        generator.start_paragraph()
-        generator.add_center(str(i))
-        generator.end_paragraph()
-        generator.add_divider()
+    r = 50
+    for i in range(r):
+        generator.start_div()
+        generator.add_center('<input type="checkbox" class="larger">')
+        generator.add_center(f'<h>{str(i)}</h>')
+        if i < r-1:
+            generator.end_div()
+            generator.add_divider()
     print(generator.assemble())
     generator.save("out.html")
+    webbrowser.open("out.html")

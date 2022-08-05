@@ -238,7 +238,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > **Apply a consistent descending packing method.**
 > 
 > ```py
-> def SuperLib.widgets.WidgetsCore.default_pack(widget, bottom: bool = False):
+> def SuperLib.widgets.WidgetsCore.default_pack(widget, bottom: bool = False, padx=5):
 > 	...
 > ```
 ### SuperLib.widgets.WidgetsCore.default_separator<a name="mark13"></a>[^](#mark5)
@@ -367,7 +367,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, widget_type, config: dict):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def disable(self, config: list = None):
@@ -612,7 +612,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, parent: tkinter.ttk.Frame, labeltext: str, config: dict, is_child: bool = False, labelside='top'):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def destroy(self):
@@ -664,7 +664,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, parent: tkinter.ttk.Frame, labeltext: str, config: dict, is_child: bool = False, labelside='top'):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def destroy(self):
@@ -750,7 +750,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, parent: tkinter.ttk.Frame, labeltext: str, config: dict, is_child: bool = False, labelside='top'):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def destroy(self):
@@ -878,7 +878,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > Tested on Mac/Windows/Linux. In most cases a TreeTable widget will be superior to this.
 > ```py
 > class Table(tkinter.ttk.Frame):
-> 	def __init__(self, *args, min_column_width: int = 100, start_column_width: int = 100, on_selection=None, **kw):
+> 	def __init__(self, *args, min_column_width: int = 100, start_column_width: int = 100, on_selection=None, visible_rows=0, **kw):
 > 		...
 > 	def build(self, contents: dict):
 > 		"""Rebuild the table"""
@@ -930,7 +930,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, parent: tkinter.ttk.Frame, labeltext: str, config: dict, is_child: bool = False, labelside='top'):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def destroy(self):
@@ -1046,7 +1046,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def __init__(self, parent: tkinter.ttk.Frame, labeltext: str, config: dict, is_child: bool = False, labelside='top'):
 > 		...
 > 	def add(self, parent, key, args, kwargs, widget_type=None):
-> 		"""Method for adding different widgets to a multiwidget post=instantiation"""
+> 		"""Method for adding different widgets to a multiwidget post-instantiation"""
 > 	def clear(self, config: list = None):
 > 		"""Pass a list of subwidgets to clear or all are set to default"""
 > 	def destroy(self):
@@ -1128,6 +1128,8 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 		"""Empties the text box. `Returns None`"""
 > 	def destroy(self):
 > 		"""Destroy this and all descendants widgets."""
+> 	def disable(self):
+> 		...
 > 	def edit_undo(self):
 > 		"""Undoes the last edit action
 > 
@@ -1137,6 +1139,8 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 >         an error when the undo stack is empty. Does nothing
 >         when the undo option is false
 >         """
+> 	def enable(self):
+> 		...
 > 	def get(self, start='1.0', end='end'):
 > 		"""Returns the contents of the text box with optional start/end kwargs. `Returns a String`"""
 > 	def get_cursor(self):
@@ -1160,6 +1164,10 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 		...
 > 	def destroy(self):
 > 		"""Destroy this and all descendants widgets."""
+> 	def disable(self):
+> 		...
+> 	def enable(self):
+> 		...
 > 
 > ```
 ## Toplevel Widgets<a name="mark79"></a>[^](#mark4)
@@ -1173,7 +1181,7 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > Window that takes focus and center's itself on the current window. Used as a base class for other windows.
 > ```py
 > class FocusedToplevel(tkinter.Toplevel):
-> 	def __init__(self, *args, title=None, window=None, **kwargs):
+> 	def __init__(self, *args, title=None, window=None, on_close=None, **kwargs):
 > 		...
 > 	def destroy(self):
 > 		...
@@ -1224,10 +1232,10 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 
 > **Prompts the user for a text input**
 > 
-> `no_destroy` can be set to `True` to allow the window to remain open after a selection is made, useful for informing the user a string input was invalid via setting label_var.
+> `no_destroy` can be set to `True` to allow the window to remain open after a selection is made, useful for informing the user a string input was invalid via setting label_var. If the select_type kwarg is set to true the user will be prompted to select a data type (int / string) to return.
 > ```py
 > class PromptWindow(SuperLib.widgets.ToplevelWidgets.FocusedToplevel):
-> 	def __init__(self, *args, text: str = 'Enter Text:', on_yes=None, yes_text: str = 'Continue', on_cancel=None, cancel_text: str = 'Cancel', bind_enter: bool = True, no_destroy: bool = False, **kwargs):
+> 	def __init__(self, *args, text: str = 'Enter Text:', on_yes=None, yes_text: str = 'Continue', on_cancel=None, cancel_text: str = 'Cancel', bind_enter: bool = True, no_destroy: bool = False, select_type: bool = False, **kwargs):
 > 		...
 > 	def destroy(self):
 > 		...
@@ -1419,6 +1427,10 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 		...
 > 	def add_divider(self):
 > 		...
+> 	def add_list(self, items=[], ordered=False):
+> 		...
+> 	def add_list_item(self, item: str):
+> 		...
 > 	def add_paragraph(self, text=''):
 > 		...
 > 	def assemble(self):
@@ -1428,6 +1440,8 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def end_center(self):
 > 		...
 > 	def end_div(self):
+> 		...
+> 	def end_list(self, ordered=False):
 > 		...
 > 	def end_paragraph(self):
 > 		...
@@ -1440,6 +1454,8 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > 	def start_center(self, text=''):
 > 		...
 > 	def start_div(self, text=''):
+> 		...
+> 	def start_list(self, items=[], ordered=False):
 > 		...
 > 	def start_paragraph(self, text=''):
 > 		...
@@ -1730,22 +1746,38 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 
 > ```py
 > class ProfilesSystem(builtins.object):
-> 	def __init__(self, select_profile_actions: list = [], profiles_dir: str = 'C:\\Users\\arcti\\github\\SuperTTK\\Profiles', handle_duplicates: bool = True):
+> 	def __init__(self, select_profile_actions: list = [], refresh_profiles_actions: list = [], profiles_dir: str = 'C:\\Users\\arcti\\github\\SuperTTK\\Profiles', handle_duplicates: bool = True):
 > 		...
+> 	def add_refresh_profiles_action(self, action):
+> 		"""Add an action to the profiles list refresh actions"""
+> 	def add_refresh_profiles_actions(self, actions: list):
+> 		"""Add a list of actions to the profiles list refresh actions"""
 > 	def add_select_profile_action(self, action):
 > 		"""Add an action to the profile switch actions"""
 > 	def add_select_profile_actions(self, actions: list):
 > 		"""Add a list of actions to the profile switch actions"""
 > 	def check_if_name_exists_in_profiles(self, name: str, profiles: list = None):
 > 		"""Check if a name exists in a list of profiles, if no list is provided uses the list of all profiles. `Returns a Bool`"""
+> 	def clear_refresh_profile_actions(self, new: list = []):
+> 		"""Clear out the profiles list refresh actions, optionally replacing them with new ones"""
 > 	def clear_select_profile_actions(self, new: list = []):
 > 		"""Clear out the profile switch actions, optionally replacing them with new ones"""
 > 	def create_profile(self, name: str):
 > 		"""Creates a profile with a given name. `Raises ValueError` if the profile name already exists. `Returns a UserProfile`"""
+> 	def delete_profile(self, profile: SuperLib.utils.ProfilesSystem.UserProfile):
+> 		...
 > 	def get_last_used_profile(self, profiles: list = None):
 > 		"""Returns the most recently accessed profile"""
+> 	def get_profile_by_username(self, name: str):
+> 		...
+> 	def get_profile_names(self):
+> 		"""Returns an alphabetically sorted list of profile names"""
 > 	def handle_duplicate_profile_names(self, name: str):
 > 		"""Makes profile names unique if they have identical names. The most recently accessed profile (according to the file json) keeps its name untouched. `Returns None`"""
+> 	def handle_refresh_profiles_actions(self):
+> 		"""Handle on-refresh-profiles actions"""
+> 	def handle_select_profile_actions(self):
+> 		"""Handle on-profile-selection actions"""
 > 	def select_profile(self, profile: SuperLib.utils.ProfilesSystem.UserProfile):
 > 		"""Change the currently selected profile"""
 > 	def select_profile_by_username(self, name: str):
@@ -1790,6 +1822,6 @@ SuperTTK exists because I got tired of rewriting the same code over and over for
 > **Gets a list of profile files at a given path. `Returns a List of Path strings`**
 > 
 > ```py
-> def SuperLib.utils.ProfilesSystem.get_profiles_list(path='../../Profiles', verbose=False):
+> def SuperLib.utils.ProfilesSystem.get_profiles_list(path='./Profiles', verbose=False):
 > 	...
 > ```
