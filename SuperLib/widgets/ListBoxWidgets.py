@@ -32,6 +32,7 @@ class Table(ttk.Frame):
         min_column_width:int=100,
         start_column_width:int=100,
         on_selection=None,
+        visible_rows=0, #Set above 1 to limit table rows
         **kw
     ):
         ttk.Frame.__init__(self, *args, **kw)
@@ -41,9 +42,10 @@ class Table(ttk.Frame):
         self.listbox_frame = tk.PanedWindow(self, orient=tk.HORIZONTAL)
         self.listbox_frame.pack(side=tk.LEFT, expand=True, fill=tk.BOTH)
         self.listboxes, self.categories, self.labels = {}, [], []
-        self.min_column_width, self.start_column_width = (
+        self.min_column_width, self.start_column_width, self.visible_rows = (
             min_column_width,
             start_column_width,
+            visible_rows
         )
         self._on_selection = on_selection
 
@@ -77,6 +79,8 @@ class Table(ttk.Frame):
                 yscrollcommand=self.scrollbar.set,
             )
             lb.pack(side=tk.LEFT, expand=True, fill=tk.BOTH, ipadx=(40))
+            if self.visible_rows:
+                lb.configure(height=self.visible_rows)
             self.listbox_frame.add(pane_frame)
             self.listbox_frame.paneconfigure(
                 pane_frame, minsize=self.min_column_width, width=self.start_column_width
@@ -143,7 +147,7 @@ class Table(ttk.Frame):
 
     def use_style(self, style:ttk.Style):
         """Update to match supplied ttk.Style object. `Returns None`"""
-        self.tile_fill = style.lookup("TEntry", "fieldbackground") or sty.lookup(
+        self.tile_fill = style.lookup("TEntry", "fieldbackground") or style.lookup(
             "TCombobox", "fieldbackground"
         )
         bg = style.lookup("TFrame", "background") or "#ffffff"

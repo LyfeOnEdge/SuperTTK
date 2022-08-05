@@ -125,6 +125,9 @@ from .utils.ProfilesSystem import ProfilesSystem, UserProfile, get_profiles_fold
 from .mega_widgets.chat import ConversationsTab
 from .mega_widgets.notes import NotesTab
 from .mega_widgets.profile_manager import ProfilesWindow
+from .mega_widgets.timecard_maker import TimecardTab, TimecardMaker
+from .mega_widgets.wattage_calculator import WattageTab, WattageCalculator
+from .mega_widgets.shopping_list import ShoppingListTab, ShoppingList
 
 CANVAS_WIDGETS = [ResizableCanvas, ScrolledCanvas, TiledCanvas, ExampleTile]
 TOPLEVEL_WIDGETS = [

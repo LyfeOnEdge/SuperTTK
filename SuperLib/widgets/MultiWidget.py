@@ -22,7 +22,7 @@ acceptable assuming the widget supports being added and .get / .set / \
             self.add(self, k, args, kwargs)
 
     def add(self, parent, key, args, kwargs, widget_type=None):
-        """Method for adding different widgets to a multiwidget post=instantiation"""
+        """Method for adding different widgets to a multiwidget post-instantiation"""
         widget_type = widget_type or self.widget_type
         w = widget_type(parent, key, *args, **kwargs)
         w.pack(fill="x", expand=False, side=tk.TOP, padx=(20, 0))

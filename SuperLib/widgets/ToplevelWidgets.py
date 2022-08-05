@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+from .WidgetsCore import default_pack
+from .RadiobuttonWidgets import LabeledRadiobutton
+
 
 if __name__ == "__main__":
     from WidgetsCore import center_window
@@ -15,18 +18,25 @@ class FocusedToplevel(tk.Toplevel):
     """Base Focused Toplevel Class""" 
 
     __desc__ = """Window that takes focus and center's itself on the current window. Used as a base class for other windows."""
-    def __init__(self, *args, title=None, window=None, **kwargs):
+    def __init__(self, *args, title=None, window=None, on_close=None, **kwargs):
         self.window = window
         if not window:
             raise ValueError('Missing required argument "window"')
         tk.Toplevel.__init__(self, *args, **kwargs)
         if title: 
             self.title(title)
+        self.on_close = on_close
+        self.protocol("WM_DELETE_WINDOW", self._on_close)
         self.frame = ttk.Frame(self)
         self.frame.pack(fill=tk.BOTH, expand=True, ipadx=10, ipady=10)
         self.grab_set()  # Set focus on this window
         self.transient(self.window)  # Force toplevel on top of window
         self.update_idletasks()
+
+    def _on_close(self, event=None):
+        if self.on_close:
+            self.on_close()
+        self.destroy()
 
     def _finish_setup(self):
         """Call this when the setup process is done to properly center the window."""
@@ -98,15 +108,15 @@ class YesNoCancelWindow(FocusedToplevel):
         button_frame.pack(side=tk.TOP, fill="x", expand=True, padx=10)
         if cancel_enabled:
             ttk.Button(button_frame, text=cancel_text, command=self._on_cancel).pack(
-                side=tk.LEFT, expand=True
+                side=tk.LEFT, expand=True, fill="x"
             )
         if no_enabled:
             ttk.Button(button_frame, text=no_text, command=self._on_no).pack(
-                side=tk.LEFT, expand=True
+                side=tk.LEFT, expand=True, fill="x",
             )
         if yes_enabled:
             ttk.Button(button_frame, text=yes_text, command=self._on_yes).pack(
-                side=tk.LEFT, expand=True
+                side=tk.LEFT, expand=True, fill="x"
             )
         self._finish_setup()
 
@@ -129,10 +139,12 @@ class YesNoCancelWindow(FocusedToplevel):
             self.destroy()
 
 
+
 class PromptWindow(FocusedToplevel):
     """Prompts the user for a text input"""
 
-    __desc__ = """`no_destroy` can be set to `True` to allow the window to remain open after a selection is made, useful for informing the user a string input was invalid via setting label_var."""
+    __desc__ = """`no_destroy` can be set to `True` to allow the window to remain open after a selection is made, useful for informing the user a string input was invalid via setting label_var. \
+If the select_type kwarg is set to true the user will be prompted to select a data type (int / string) to return."""
     def __init__(
         self,
         *args,
@@ -143,12 +155,14 @@ class PromptWindow(FocusedToplevel):
         cancel_text:str="Cancel",
         bind_enter:bool=True,
         no_destroy:bool=False,
+        select_type:bool=False,
         **kwargs,
     ):
         FocusedToplevel.__init__(self, *args, **kwargs)
         self.on_yes = on_yes
         self.on_cancel = on_cancel
         self.no_destroy = no_destroy
+        self.select_type = select_type
         self.label_var = tk.StringVar()
         self.label_var.set(text)
         ttk.Label(
@@ -160,6 +174,14 @@ class PromptWindow(FocusedToplevel):
         entry.pack(side=tk.TOP, fill="x", padx=10, pady=(0, 5))
         if bind_enter:
             entry.bind("<Return>", self._on_yes)
+
+        self.typemap = {"String":str,"Integer":int,"Float":float}
+        if select_type:
+            self.types = LabeledRadiobutton(
+                self.frame, "Value Type", ("String","Integer","Float"), 0
+            )
+            default_pack(self.types)
+                 
         button_frame = ttk.Frame(self.frame)
         button_frame.pack(side=tk.TOP, fill="x", expand=True, padx=10)
         ttk.Button(button_frame, text=cancel_text, command=self._on_cancel).pack(
@@ -172,7 +194,17 @@ class PromptWindow(FocusedToplevel):
 
     def _on_yes(self, event=None):
         if self.on_yes:
-            self.on_yes(self.var.get())
+            if self.select_type:
+                t = self.typemap[self.types.get()]
+                val = self.var.get()
+                try:
+                    val = t(val)
+                except Exception as e:
+                    NoticeWindow(window=self, text=f'Error interpreting provided value as type "{t.__name__}"')
+                    return
+                self.on_yes(val)
+            else:
+                self.on_yes(self.var.get())
         if not self.no_destroy:
             self.destroy()
 
@@ -181,6 +213,7 @@ class PromptWindow(FocusedToplevel):
             self.on_cancel(self.var.get())
         if not self.no_destroy:
             self.destroy()
+
 
 class ListWindow(FocusedToplevel):
     """Window to select an option from a Scrolled Listbox"""

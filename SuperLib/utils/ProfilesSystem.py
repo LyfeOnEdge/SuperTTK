@@ -1,7 +1,8 @@
 import os, json
 from .utils import get_unix_timestring, get_unix_timestamp
-PROFILES_REL_PATH = "../../Profiles"
-PROFILES_FOLDER = os.path.join(os.path.dirname(__file__), PROFILES_REL_PATH)
+PROFILES_REL_PATH = "./Profiles"
+PROFILES_FOLDER = PROFILES_REL_PATH
+##PROFILES_FOLDER = os.path.join(os.path.dirname(__file__), PROFILES_REL_PATH)
 # if not os.path.is_dir(PROFILES_FOLDER):
 #   os.makedirs(PROFILES_FOLDER,exist_ok=True)
 
@@ -102,6 +103,8 @@ class ProfilesSystem:
             
         if self.profiles:
             self.current_profile = self.profiles[0]
+        else:
+            self.create_profile("Default")
         self.clear_select_profile_actions(self.select_profile_actions)
 
     def add_select_profile_action(self, action):

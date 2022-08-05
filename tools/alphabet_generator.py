@@ -3,7 +3,8 @@ import os
 
 COLORS = ["black", "white"]
 FONT_SIZES = [16,20,24,32,48,64]
-CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&~`+-.="
+##CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&~`+-.="
+CHARACTERS = string.printable
 OUTDIR = os.path.abspath("./generated")
 
 os.makedirs(OUTDIR,exist_ok=True)

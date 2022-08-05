@@ -84,9 +84,9 @@ def default_separator(f: ttk.Frame, padx:int=35, pady=(10, 5)):
     ttk.Separator(f, orient="horizontal").pack(fill="x", padx=padx, pady=pady)
 
 
-def default_pack(widget, bottom:bool=False):
+def default_pack(widget, bottom:bool=False, padx=5):
     """Apply a consistent descending packing method."""
-    widget.pack(fill="x", expand=False, side=tk.TOP, padx=5, pady=(0, 5 * bottom))
+    widget.pack(fill="x", expand=False, side=tk.TOP, padx=padx, pady=(0, 5 * bottom))
 
 
 def default_vertical_separator(frame: ttk.Frame, pady:int=15, padx:int=10):

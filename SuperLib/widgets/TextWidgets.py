@@ -58,6 +58,12 @@ class ScrolledText(Scroller, tk.Text, SuperWidgetMixin):
         """Sets the cursor to a given col / row. `Returns None`"""
         text_widget_name.mark_set(tk.INSERT, "%d.%d" % (col, row))
 
+    def enable(self):
+        self.config(state="normal")
+
+    def disable(self):
+        self.config(state="disable")
+
 
 class CopyBox(ttk.Frame):
     """Scrolled Text with "Copy tp Clipboard" Button"""
@@ -78,5 +84,11 @@ class CopyBox(ttk.Frame):
         self.clipboard_clear()
         self.clipboard_append(self.get())
         self.after(1000, lambda: self.button.configure(text="Copy To Clipboard"))
+
+    def enable(self):
+        self.text.enable()
+
+    def disable(self):
+        self.text.disable()
 
 TEXT_WIDGETS = [ScrolledText, CopyBox]

@@ -2,8 +2,10 @@
     "username": "Test 2",
     "atomic": "1659406391131345600",
     "preferences": {
-        "theme": "black"
+        "theme": "black",
+        "Shopping.favorites": [],
+        "Shopping.cart": []
     },
     "last_edited": 1659406391131345600,
-    "last_accessed": 1659500821456943300
+    "last_accessed": 1659660179298711000
 }
