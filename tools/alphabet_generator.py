@@ -4,11 +4,12 @@ import os
 FONTPATH = os.path.abspath("../assets/fonts/Open_Sans/static/OpenSans/OpenSans-Bold.ttf")
 OUTDIR = os.path.abspath("../assets/generated")
 COLORS = ["black", "white"]
-FONT_SIZES = [16,20,24,32,48,64]
+FONT_SIZES = [8,10,12,14,16,18,20,22,24,26,28,30,32,36,40,48,64,128,256]
 CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%&~`+-.="
 os.makedirs(OUTDIR,exist_ok=True)
 
 def make_char_image(c, siz, fnt, clr):
+	print(c, siz, clr)
 	halfsiz = siz/2
 	img = Image.new("RGBA",(siz,siz),(0,0,0,0))
 	draw = ImageDraw.Draw(img)

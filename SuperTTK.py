@@ -819,6 +819,7 @@ if __name__ == "__main__":
         def __init__(self):
             App.__init__(self, "ini.json")
 
+            self.tictactoe = TicTacToeTab(self.notebook)
             self.shopping_list = ShoppingListTab(self.notebook, self)
             if PILLOW_AVAILABLE:
                 self.pillow_tab = PillowTab(self.notebook)

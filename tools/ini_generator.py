@@ -3,7 +3,7 @@ import json
 json_data = {
     "application": "Test Application",
     "version": "0.0",
-    "icon": "./assets/ico.png",  # Set to icon path relative to wd
+    "icon": None,  # Set to icon path relative to script file
     "width": 400,
     "height": 400,
     "minwidth": 60,

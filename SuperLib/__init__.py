@@ -128,6 +128,7 @@ from .mega_widgets.profile_manager import ProfilesWindow
 from .mega_widgets.timecard_maker import TimecardTab, TimecardMaker
 from .mega_widgets.wattage_calculator import WattageTab, WattageCalculator
 from .mega_widgets.shopping_list import ShoppingListTab, ShoppingList
+from .mega_widgets.tictactoe import TicTacToeTab, TicTacToe
 
 CANVAS_WIDGETS = [ResizableCanvas, ScrolledCanvas, TiledCanvas, ExampleTile]
 TOPLEVEL_WIDGETS = [
