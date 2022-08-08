@@ -19,7 +19,9 @@ json_data = {
     "enable_fullscreen": True,
     "enable_themes_menu": True,
     "movable_tabs":True,
-    "enable_users":True, #Enables a user profiles system. 
+    "enable_users":True, #Enables a user profiles system.
+    "conversations_enabled": False,
+    "notes_enabled": False,
 }
 
 print(json.dumps(json_data, indent=4))

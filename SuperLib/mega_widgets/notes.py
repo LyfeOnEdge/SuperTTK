@@ -65,7 +65,7 @@ ACTION_ICON_PADDING = 5
 MESSAGE_BORDER_WIDTH = 2
 NOTES_FOLDER = os.path.abspath("Notes")
 NOTE_FILE_ENDING = "_meta.json"
-os.makedirs(NOTES_FOLDER, exist_ok=True)
+
 
 
 def get_notes_list():
@@ -551,6 +551,7 @@ class NotesTab(Tab):
         Tab.__init__(self, notebook, "Notes")
         self.toplevel = None
         self.load_notes()
+        os.makedirs(NOTES_FOLDER, exist_ok=True)
         note_menu = tk.Menu(self.app.menu, tearoff=0)
         note_menu.add_command(label="New Notepad", command=self.new_note)
         note_menu.add_command(label="Refresh notes", command=self.reload_notes)

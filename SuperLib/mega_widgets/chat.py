@@ -54,8 +54,6 @@ ACTION_ICON_PADDING = 5
 MESSAGE_BORDER_WIDTH = 2
 CONVERSATIONS_FOLDER = os.path.abspath("Conversations")
 CONVERSATION_FILE_ENDING = "_meta.json"
-os.makedirs(CONVERSATIONS_FOLDER, exist_ok=True)
-
 
 def get_conversations_list():
     conversations = []
@@ -656,6 +654,7 @@ class ConvoTab(Tab):
 class ConversationsTab(Tab):
     def __init__(self, notebook, app):
         self.app = app
+        os.makedirs(CONVERSATIONS_FOLDER, exist_ok=True)
         Tab.__init__(self, notebook, "Conversations")
         self.cached_icons = {}
         self.toplevel = None

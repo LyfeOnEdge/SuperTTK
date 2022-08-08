@@ -14,5 +14,5 @@
     "enable_themes_menu": true,
     "enable_users": true,
     "movable_tabs": true,
-    "icon": "./assets/ico.png"
+    "icon": "./assets/ico.png",
 }
