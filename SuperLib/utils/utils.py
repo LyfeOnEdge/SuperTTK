@@ -11,7 +11,7 @@ from collections import OrderedDict
 
 def modify_filename(path, add):
     filename, ext = path.rsplit(".", 1)
-    return filename+add+ext
+    return filename+add+"."+ext
 
 def check_string_contains(string:str, contains_list:tuple):
     """Returns `(True, char_index)` if any character from the list exists in the string otherwise returns `(False, None)`"""

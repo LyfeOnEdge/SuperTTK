@@ -39,10 +39,12 @@ class FocusedToplevel(tk.Toplevel):
         self.destroy()
 
     def _finish_setup(self):
-        """Call this when the setup process is done to properly center the window."""
-        self.update_idletasks()
-        self.resizable(False, False)
-        center_window(self.window, self)
+        def finish_setup():
+            """Call this when the setup process is done to properly center the window."""
+            self.update_idletasks()
+            self.resizable(False, False)
+            center_window(self.window, self)
+        self.after(100, finish_setup)
 
     def destroy(self):
         try:
