@@ -9,6 +9,10 @@ from collections import OrderedDict
 #     installed_packages = [r.decode().split("==")[0] for r in reqs.split()]
 #     return module_name in installed_packages
 
+def modify_filename(path, add):
+    filename, ext = path.rsplit(".", 1)
+    return filename+add+ext
+
 def check_string_contains(string:str, contains_list:tuple):
     """Returns `(True, char_index)` if any character from the list exists in the string otherwise returns `(False, None)`"""
     for c in contains_list:

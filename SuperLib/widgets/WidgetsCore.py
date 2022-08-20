@@ -14,10 +14,9 @@ WINDOWS_SYMBOL = "⊞"
 ASSETS_REL_PATH = "../../assets"
 ASSETS_FOLDER = os.path.join(os.path.dirname(__file__), ASSETS_REL_PATH)
 
-
 def get_asset(path, folder=ASSETS_FOLDER):
     """Gets an asset from the included assets folder by relative path"""
-    return os.path.join(folder, path)
+    return os.path.abspath(os.path.join(folder, path))
 
 def get_themes_folder():
     """Gets the absolute path to the included themes folder"""
@@ -39,7 +38,6 @@ def get_bundled_themes_list(verbose=False):
     if verbose:
         print(f"Found {len(themes)} bundled themes: {json.dumps(themes, indent=4)}")
     return themes
-
 
 
 def force_aspect(inner_frame:ttk.Frame, outer_frame:ttk.Frame, ratio=(16 / 9)):

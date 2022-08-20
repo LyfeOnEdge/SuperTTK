@@ -111,16 +111,17 @@ from .utils.utils import (
     check_if_module_installed,
     check_string_contains,
     dummy_function,
+    format_SI,
+    get_friendly_modified_time,
     get_friendly_time,
     get_installed_packages,
     get_unix_timestamp,
     get_unix_timestring,
     get_user_home_folder,
+    modify_filename,
     open_folder_in_explorer,
     sort_dict_by_keys,
     timer_decorator,
-    format_SI,
-    get_friendly_modified_time
 )
 from .utils.History import HistoryMixin
 from .utils.scaling import enable_dpi_awareness
