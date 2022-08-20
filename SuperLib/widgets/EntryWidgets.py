@@ -113,7 +113,6 @@ class LabeledMultiEntry(Labeler, ttk.Frame, MultiWidgetMixin):
         MultiWidgetMixin.__init__(self, LabeledEntry, config)
         self.is_child = is_child
 
-
 class LabeledButtonEntry(LabeledEntry):
     """LabeledEntry with a ttk.Button on the right"""
 
@@ -124,6 +123,26 @@ class LabeledButtonEntry(LabeledEntry):
         )
         self.button.pack(expand=False, side=tk.RIGHT)
 
+class LabeledMultiButtonEntry(Labeler, ttk.Frame, MultiWidgetMixin):
+    """Labeled MultiWidget LabeledEntry"""
+
+    __desc__ = """Used when you need multiple, vertically stacked Labeled Button Entries"""
+
+    def __init__(
+        self,
+        parent: ttk.Frame,
+        labeltext: str,
+        config: dict,
+        is_child: bool = False,
+        labelside=tk.TOP,
+    ):
+        Labeler.__init__(
+            self, parent, labeltext, labelside=labelside, header=not is_child
+        )
+        ttk.Frame.__init__(self, self.frame)
+        ttk.Frame.pack(self, fill=tk.BOTH, expand=True, side=tk.TOP)
+        MultiWidgetMixin.__init__(self, LabeledButtonEntry, config)
+        self.is_child = is_child
 
 class PasswordEntry(ttk.Frame):
     """Username / Password Entry"""
@@ -202,11 +221,11 @@ entries is disabled."
         if self.command:
             self.command((self.username_entry.get(), self.password_entry.get()))
 
-
 ENTRY_WIDGETS = [
     ScrolledEntry,
     LabeledEntry,
     LabeledMultiEntry,
     LabeledButtonEntry,
+    LabeledMultiButtonEntry,
     PasswordEntry,
 ]

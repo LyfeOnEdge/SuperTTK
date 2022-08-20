@@ -52,6 +52,7 @@ from .widgets.EntryWidgets import (
     LabeledEntry,
     LabeledMultiEntry,
     LabeledButtonEntry,
+    LabeledMultiButtonEntry,
     PasswordEntry,
     ENTRY_WIDGETS,
 )
@@ -75,7 +76,7 @@ from .widgets.RadiobuttonWidgets import (
 from .widgets.TextWidgets import ScrolledText, CopyBox, TEXT_WIDGETS
 from .widgets.ConsoleWidgets import ConsoleWidget, CONSOLE_WIDGETS
 from .widgets.ListBoxWidgets import ScrolledListBox, Table, LISTBOX_WIDGETS
-from .widgets.TreeviewWidgets import TreeTable
+from .widgets.TreeviewWidgets import TreeTable, ScrolledTree
 from .widgets.ToplevelWidgets import (
     FocusedToplevel,
     NoticeWindow,
@@ -118,6 +119,8 @@ from .utils.utils import (
     open_folder_in_explorer,
     sort_dict_by_keys,
     timer_decorator,
+    format_SI,
+    get_friendly_modified_time
 )
 from .utils.History import HistoryMixin
 from .utils.scaling import enable_dpi_awareness
@@ -169,3 +172,4 @@ else:
     PILLOW_AVAILABLE = True
     print("Pillow detected, importing pillow-only widgets")
     from .pillow_widgets.GifLoader import GifLoader, GifViewer
+    from .pillow_widgets.ImageCore import load_tk_image_from_bytes_array

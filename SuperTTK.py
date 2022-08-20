@@ -173,6 +173,8 @@ class App(_AbstractAppMixin):
         if self.profiles_enabled:
             profile = self.profiles.current_profile
             theme = profile.get_preference("theme") if profile else theme
+        if not theme in self.available_themes:
+            print(f'Unable to find loaded user\'s selected theme {theme}. Defaulting to theme "Default"')
         self.use_theme(theme)
         self.update_default_title()
 
@@ -221,8 +223,8 @@ again with the name which instead calls the Profiles System to use a certain pro
         """Apply settings from the current profile. For more complicated profile systems \
 override this function."""
         theme = profile.get_preference("theme")
-        if not theme:
-            print("User had invalid theme selected in profile, repairing...")
+        if not theme or not theme in self.available_themes:
+            print(f"User had invalid theme selected in profile - {theme}, repairing...")
             profile.set_preference("theme", "default")
         self.use_theme(profile.get_preference("theme"))
 

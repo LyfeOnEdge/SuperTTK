@@ -35,7 +35,7 @@ from tkinter.ttk import (
 )
 from PIL import Image, ImageTk
 
-from .TreeviewWidgets import ScrolledTree
+# from .TreeviewWidgets import ScrolledTree
 
 WIDTH = 550
 HEIGHT = 400

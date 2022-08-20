@@ -25,7 +25,7 @@ acceptable assuming the widget supports being added and .get / .set / \
         """Method for adding different widgets to a multiwidget post-instantiation"""
         widget_type = widget_type or self.widget_type
         w = widget_type(parent, key, *args, **kwargs)
-        w.pack(fill="x", expand=False, side=tk.TOP, padx=(20, 0))
+        w.pack(fill="x", expand=False, side=tk.TOP, padx=(20,0), pady=(5,0))
         self.widgets[key] = w
 
     def get(self, config: list = None):

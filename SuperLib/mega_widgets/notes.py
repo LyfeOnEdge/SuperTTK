@@ -550,8 +550,8 @@ class NotesTab(Tab):
         self.app = app
         Tab.__init__(self, notebook, "Notes")
         self.toplevel = None
-        self.load_notes()
         os.makedirs(NOTES_FOLDER, exist_ok=True)
+        self.load_notes()
         note_menu = tk.Menu(self.app.menu, tearoff=0)
         note_menu.add_command(label="New Notepad", command=self.new_note)
         note_menu.add_command(label="Refresh notes", command=self.reload_notes)

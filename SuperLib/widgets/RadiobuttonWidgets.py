@@ -17,6 +17,7 @@ class LabeledRadiobutton(Labeler, ttk.Frame):
         options: list = [],
         default: int = 0,
         is_child: bool = False,
+        **kw
     ):
         self.var = tk.StringVar()
         self.default = options[default]
@@ -26,7 +27,7 @@ class LabeledRadiobutton(Labeler, ttk.Frame):
         ttk.Frame.__init__(self, self.frame)
         ttk.Frame.pack(self, fill=tk.BOTH, expand=True, side=tk.LEFT)
         for o in options:
-            b = ttk.Radiobutton(self, text=o, value=o, variable=self.var)
+            b = ttk.Radiobutton(self, text=o, value=o, variable=self.var, **kw)
             b.pack(fill="x", expand=False, side=tk.TOP, padx=(20, 0))
 
     def enable(self):

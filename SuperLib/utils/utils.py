@@ -1,4 +1,4 @@
-import os, sys, time, json
+import os, sys, time, json, platform
 import pkg_resources
 from collections import OrderedDict
 
@@ -66,6 +66,9 @@ def get_friendly_time(timestamp, mode="all"):
     else:
         raise ValueError(f"Unsupported mode - {mode}")
 
+def get_friendly_modified_time(path:str):
+    """Get a readable modified date for a file"""
+    return get_friendly_time(os.path.getmtime(path))
 
 def get_user_home_folder():
     """Cross-platform function to get a user's home folder"""
@@ -124,3 +127,11 @@ class PyScriptRunner:
         if self.print_function:
             self.print_function(string)
             sys.stdout.flush()
+
+# Public domain code to convert SI size in to be friendly, does bytes by default
+def format_SI(num, suffix="B"):
+    divider = 1024  # 1000 for MiB
+    for unit in ["", "k", "M", "G", "T", "P", "E", "Z"]:
+        if abs(num) < 1024.0:
+            return "%3.1f %s%s" % (num, unit, suffix)
+        num /= 1024.0
