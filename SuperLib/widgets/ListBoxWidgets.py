@@ -85,8 +85,7 @@ class Table(ttk.Frame):
             self.listbox_frame.paneconfigure(
                 pane_frame, minsize=self.min_column_width, width=self.start_column_width
             )
-            lb.bind("<<ListboxSelect>>", self._on_selection)
-            lb.bind("<ButtonPress-1>", self._on_press)
+            lb.bind("<ButtonPress-1>", self._on_press, add="+")
             for item in contents[title]:
                 lb.insert("end", item)
 
@@ -98,18 +97,21 @@ class Table(ttk.Frame):
             i += 1
 
     def _on_press(self, event):
-        root = self.winfo_toplevel()
-        cursor_y = root.winfo_pointery()
-        l = event.widget
-        cursor_y -= l.winfo_rooty()
-        index = l.nearest(cursor_y)
-        l.select_set(index)
-        l.activate(index)
-        for lb in self.listboxes:
-            self.listboxes[lb].select_set(index)
-            self.listboxes[lb].activate(index)
-        if self._on_selection:
-            self._on_selection(self.listboxes.get(index))
+        if event:
+            root = self.winfo_toplevel()
+            cursor_y = root.winfo_pointery()
+            l = event.widget
+            cursor_y -= l.winfo_rooty()
+            index = l.nearest(cursor_y)
+            l.select_set(index)
+            l.activate(index)
+            for lb in self.listboxes:
+                self.listboxes[lb].selection_clear(0, tk.END)
+                self.listboxes[lb].yview_moveto(l.yview()[0])
+                self.listboxes[lb].select_set(index)
+                self.listboxes[lb].activate(index)
+            if self._on_selection:
+                self._on_selection(self.listboxes.get(index))
 
     def _on_mouse_wheel(self, event):
         l = self.listboxes[self.categories[0]]
@@ -131,19 +133,6 @@ class Table(ttk.Frame):
         if move_type == "moveto":
             for lb in self.listboxes:
                 self.listboxes[lb].yview_moveto(move_units)
-
-    def _on_selection(self, event):
-        l = event.widget
-        index = l.curselection()
-        l.select_set(index)
-        l.activate(index)
-        clicked_listbox = event.widget
-        index = clicked_listbox.curselection()
-        for lb in self.listboxes:
-            self.listboxes[lb].selection_clear(0, tk.END)
-            self.listboxes[lb].yview_moveto(clicked_listbox.yview()[0])
-            self.listboxes[lb].select_set(index)
-            self.listboxes[lb].activate(index)
 
     def use_style(self, style:ttk.Style):
         """Update to match supplied ttk.Style object. `Returns None`"""

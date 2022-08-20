@@ -66,6 +66,8 @@ class App(_AbstractAppMixin):
         self.window.wait_visibility(self.window)
         self.window.tk.call("tk", "scaling", self.scaling)
 
+        self.theme_textboxes = self.ini_data.get("theme_textboxes", True)
+
         # This toolkit is designed around the idea of "Tabs"
         # This is the highest level tab available.
         self.notebook = ttk.Notebook(self.window)
@@ -262,6 +264,7 @@ override this function."""
         text_fg = self.style.lookup("TEntry", "foreground") or "#000000"
         text_bg = self.style.lookup("TEntry", "fieldbackground") or "white"
         self.style.configure("Bold.TLabel", font=self.bold_font)
+        self.style.configure("LargeBold.TLabel", font=self.large_bold_font)
         self.style.configure(
             "NoPad.TButton",
             padding=0,
@@ -279,8 +282,9 @@ override this function."""
         widgets = complex_widget_search(
             self.window, (ScrolledText, ScrolledCanvas, Table)
         )
-        for w in widgets[ScrolledText]:
-            w.configure(bg=text_bg, fg=text_fg)
+        if self.theme_textboxes:
+            for w in widgets[ScrolledText]:
+                w.configure(bg=text_bg, fg=text_fg)
         for w in widgets[ScrolledCanvas]:
             w.use_style(self.style)
         for w in widgets[Table]:
