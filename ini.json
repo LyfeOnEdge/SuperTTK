@@ -1,8 +1,8 @@
 {
     "application": "Test Application",
     "version": "0.0",
-    "width": 400,
-    "height": 400,
+    "width": 800,
+    "height": 600,
     "minwidth": 60,
     "minheight": 60,
     "resizable_width": true,
@@ -10,9 +10,11 @@
     "start_maximized": false,
     "start_fullscreen": false,
     "enable_fullscreen": true,
-    "scaling": 1.75,
+    "scaling": 1.5,
     "enable_themes_menu": true,
     "enable_users": true,
     "movable_tabs": true,
     "icon": "./assets/ico.png",
+    "conversations_enabled": false,
+    "notes_enabled": false
 }

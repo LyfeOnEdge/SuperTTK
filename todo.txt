@@ -24,3 +24,6 @@ def choose_color():
     # variable to store hexadecimal code of color
     color_code = colorchooser.askcolor(title ="Choose color")
     print(color_code)
+
+
+exception handling in tkinter mainloop with special NotImplemented and NotAvailable exceptions that get caught by the mainloop and inform the user with a popup
